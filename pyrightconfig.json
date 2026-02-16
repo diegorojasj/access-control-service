@@ -1,0 +1,24 @@
+{
+  "include": [
+    "backend"
+  ],
+  "exclude": [
+    "backend/.venv",
+    "backend/__pycache__",
+    "backend/.mypy_cache",
+    "backend/.ruff_cache"
+  ],
+  "extraPaths": [
+    "backend"
+  ],
+  "venvPath": "backend",
+  "venv": ".venv",
+  "pythonVersion": "3.13",
+  "typeCheckingMode": "standard",
+  "useLibraryCodeForTypes": true,
+  "reportMissingImports": "error",
+  "reportMissingTypeStubs": false,
+  "reportUndefinedVariable": "error",
+  "reportAttributeAccessIssue": "warning",
+  "reportArgumentType": "warning"
+}
