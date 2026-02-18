@@ -1,29 +1,20 @@
 # Access Control Service
 
-## Overview
-A standalone RBAC microservice with FastAPI. Features: user/role/permission management, middleware-based route protection, permission inheritance (admin > manager > viewer), JWT with HTTP-only cookie auth, and a React admin panel to manage roles visually with shadcn/ui.
+## Requirements
+- Podman
+- Podman Compose
+- Python 3.12
+- Bun
 
-## Tech Stack
-**Frontend:** Bun, React.js, shadcn/ui, tailwindcss
+## Deployment
+Execute the command `podman compose up -d` to start the service.
 
-**Backend:** Python, uvicorn, FastAPI, SQLAlchemy
+## Stop
+Execute the command `podman compose down` to stop the service.
 
-**Database:** PostgreSQL
-
-**Tools:** Podman Compose
-
-
-## Project Structure
-
-Poman Containers:
-- postgres
-- backend
-- nginx(frontend)
-
-## 🔐 Security Instructions
-To rotate the key pair (private key and public key), execute the following commands in `backend/src/keys` folder and replace the old files:
-
-```bash
-openssl genpkey -algorithm ed25519 -out private_key.pem
-openssl pkey -in private_key.pem -pubout -out public_key.pem
-```
+## Documents
+| Description       | Document                                          |
+|-------------------|---------------------------------------------------|
+| Overview          | [docs/overview](docs/overview.md)                 |
+| Permission Format | [docs/permissionFormat](docs/permissionFormat.md) |
+| Default Data      | [docs/defaultData](docs/defaultData.md)           |
