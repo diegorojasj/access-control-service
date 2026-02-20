@@ -2,6 +2,8 @@ x-postgres-env: &postgres-env
   POSTGRES_USER: ${POSTGRES_USER}
   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
   POSTGRES_DB: ${POSTGRES_DB}
+  POSTGRES_HOST: ${POSTGRES_HOST:-localhost}
+  POSTGRES_PORT: ${POSTGRES_PORT:-5432}
 
 services:
   postgres:
@@ -16,16 +18,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: podman/containerfiles/backend-dev
-    command:
-      - sh
-      - -c
-      - |
-        set -e
-        ARGS="--host ${HOST:-0.0.0.0} --port ${PORT:-8000} --log-level ${LOG_LEVEL:-info}"
-        if [ "${RELOAD:-false}" = "true" ]; then ARGS="$ARGS --reload"; fi
-        if [ -n "${WORKERS}" ] && [ "${WORKERS}" != "1" ]; then ARGS="$ARGS --workers ${WORKERS}"; fi
-        exec uvicorn main:app $ARGS
+      dockerfile: podman/containerfiles/backend.containerfile
     ports:
       - "8000:8000"
     volumes:
@@ -33,8 +26,28 @@ services:
       - ./backend/requirements.default:/app/requirements.txt:z
     environment:
       <<: *postgres-env
+      HOST: ${HOST:-localhost}
+      PORT: ${PORT:-8000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      RELOAD: ${RELOAD:-false}
+      WORKERS: ${WORKERS:-4}
+      ACCESS_LOG: ${ACCESS_LOG:-true}
+      LIFESPAN: ${LIFESPAN:-auto}
+      HTTP: ${HTTP:-h11}
+      WS: ${WS:-auto}
+      PROXY_HEADERS: ${PROXY_HEADERS:-true}
+      FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-*}
+      LIMIT_MAX_REQUESTS: ${LIMIT_MAX_REQUESTS:-}
     depends_on:
       - postgres
+  web:
+    build:
+      context: .
+      dockerfile: podman/containerfiles/web.containerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:

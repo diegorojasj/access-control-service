@@ -4,8 +4,11 @@ A standalone RBAC microservice with FastAPI. Features: user/role/permission mana
 ## Design approach
 
 **Architecture:** Modular Monolith with Layered (N-Tier) Architecture per module
+
 **Design patterns:** Repository Pattern, Dependency Injection, JWT Authentication, HTTP-only Cookies, RBAC
+
 **Software Principles:** SOLID, DRY, KISS, YAGNI
+
 **Software Paradigms:** Reactive Programming
 
 ## Tech Stack

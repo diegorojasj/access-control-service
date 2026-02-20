@@ -1,0 +1,21 @@
+FROM python:3.12-alpine
+# Prevent Python from buffering stdout/stderr
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+
+# Copy backend code and install deps
+RUN python -m pip install --no-cache-dir -r /app/requirements.txt
+
+# Copy the backend source
+COPY backend/ /app/
+
+# Expose backend port
+EXPOSE 8000
+
+COPY podman/entrypoints/entrypoint-python.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Default command (can be overridden in the Deployment)
+CMD ["python", "-u", "-m", "uvicorn", "main:app", "--config", "uvicorn_config.py"]
