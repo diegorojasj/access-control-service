@@ -1,6 +1,7 @@
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session as SessionType
+from typing import Generator
 
 # Get the environment variables
 user = os.getenv("POSTGRES_USER", "postgres")
@@ -15,5 +16,13 @@ DATABASE_URL = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db}"
 # Create the engine
 engine = create_engine(DATABASE_URL)
 
-# Create session
-session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+# Create session factory
+Session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
+# Dependency for FastAPI routes
+def get_db() -> Generator[SessionType, None, None]:
+    db = Session()
+    try:
+        yield db
+    finally:
+        db.close()

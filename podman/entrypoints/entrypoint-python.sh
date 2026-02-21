@@ -8,6 +8,7 @@ while [ ! -f requirements.txt ]; do
 done
 
 echo "Found requirements.txt, installing dependencies..."
+pip install --upgrade pip
 pip install --no-cache-dir -r requirements.txt
 
 # Execute the provided command (CMD from Dockerfile)

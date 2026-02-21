@@ -9,17 +9,36 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { useMutateRequest } from "@/shared/useRequest"
+import { encode } from "@/shared/utils"
 import { sileo } from "sileo"
 
-const onSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    sileo.success({
-        title: "Login successful",
-        description: "You are now logged in",
-    })
-}
-
 const LoginForm = () => {
+    // Variables
+    const request = useMutateRequest({
+        url: '/auth/login',
+        method: 'POST'
+    })
+
+    // Functions
+    const onSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        sileo.success({
+            title: "Login successful",
+            description: "You are now logged in",
+        })
+        const { username, password } = e.currentTarget as typeof e.currentTarget & {
+            username: HTMLInputElement
+            password: HTMLInputElement
+        }
+
+        const encodePassword = encode(password.value)
+
+        // request.mutate({
+        //     username: username.value,
+        //     password: encodePassword
+        // })
+    }
     return (
         <Card className="w-full max-w-sm p-6">
             <CardHeader>

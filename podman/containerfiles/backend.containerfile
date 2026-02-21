@@ -4,6 +4,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Copy backend code and install deps
+COPY backend/requirements.default ./requirements.txt
 RUN python -m pip install --no-cache-dir -r /app/requirements.txt
 
 # Copy the backend source
@@ -18,4 +19,4 @@ RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Default command (can be overridden in the Deployment)
-CMD ["python", "-u", "-m", "uvicorn", "main:app", "--config", "uvicorn_config.py"]
+CMD ["python", "-u", "run_uvicorn.py"]

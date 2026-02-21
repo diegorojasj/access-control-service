@@ -17,6 +17,7 @@ async function request<T>(config: RequestConfig): Promise<T> {
 
     const res = await fetch(url, {
         method,
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
             ...headers,

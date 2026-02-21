@@ -14,7 +14,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres/data:/var/lib/postgresql/data
+      - ./postgres/data:/var/lib/postgresql/data:Z
   backend:
     build:
       context: .
@@ -30,7 +30,7 @@ services:
       PORT: ${PORT:-8000}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       RELOAD: ${RELOAD:-false}
-      WORKERS: ${WORKERS:-4}
+      WORKERS: ${WORKERS:-1}
       ACCESS_LOG: ${ACCESS_LOG:-true}
       LIFESPAN: ${LIFESPAN:-auto}
       HTTP: ${HTTP:-h11}
@@ -44,10 +44,12 @@ services:
     build:
       context: .
       dockerfile: podman/containerfiles/web.containerfile
+    profiles: ["PROD"]
     ports:
       - "80:80"
+      - "443:443"
+    environment:
+      BUN_PUBLIC_API_BASE_URL: ${BUN_PUBLIC_API_BASE_URL:-http://localhost:8000}
+      BUN_PUBLIC_ENCRYPTION_SECRET: ${BUN_PUBLIC_ENCRYPTION_SECRET:-J0£\=i9=XHT{i&v9njwRj~Oo3kzy0Hk[77Jwz7N+ms1KOJ^/e;}
     depends_on:
       - backend
-
-volumes:
-  postgres_data:
