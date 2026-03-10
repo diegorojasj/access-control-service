@@ -1,18 +1,18 @@
 import Layout from "@/core/Layout"
+import RootLayout from "@/core/RootLayout"
 import { Navigate, Outlet } from "react-router-dom"
 import { AppStore } from "./AppContext"
 
 const AuthorizedComponent = () => {
     const { user } = AppStore()
 
-    if (!user) {
-        return <Navigate to="/login" replace />
-    }
-
     return (
-        <Layout>
-            <Outlet />
-        </Layout>
+        <RootLayout>
+            {!user
+                ? <Navigate to="/login" replace />
+                : <Layout><Outlet /></Layout>
+            }
+        </RootLayout>
     )
 }
 

@@ -13,6 +13,7 @@ class SessionRepository:
         user = self.session.query(User).filter(User.username == username).first()
         if user is None or not passwordVerify(password, user.password):
             return None
+        return user
         
 
         

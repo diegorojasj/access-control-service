@@ -16,8 +16,7 @@ const server = serve({
   port: Number(process.env.FRONTEND_PORT ?? 3000),
   routes: {
     "/auth/*": proxyToBackend,
-    "/roles/*": proxyToBackend,
-    "/permissions/*": proxyToBackend,
+    "/user/*": proxyToBackend,
     "/*": index,
   },
 

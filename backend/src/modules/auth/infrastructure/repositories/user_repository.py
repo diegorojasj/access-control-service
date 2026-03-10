@@ -5,10 +5,11 @@ class UserRepository:
         self.session = session
 
     def get_all(self):
-        return self.session.query(User).all()
+        rows = self.session.query(User.id, User.name, User.username, User._role.label("role")).all()
+        return [row._asdict() for row in rows]
 
     def get_by_name(self, name):
-        return self.session.query(User).filter(User.name == name).first()
+        return self.session.query(User.id, User.name, User.username, User._role.label("role")).filter(User.name == name).first()
 
     def create(self, user):
         self.session.add(user)

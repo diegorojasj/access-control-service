@@ -5,7 +5,7 @@ from src.security.token import create_access_token
 from datetime import datetime, timedelta, timezone
 import os
 
-from pwdlib import PasswordHash
+from pwdlib import PasswordHash, exceptions as pwdlib_exceptions
 from pwdlib.hashers.argon2 import Argon2Hasher
 
 from src.modules.auth.infrastructure.entities.user_entity import User
@@ -45,4 +45,7 @@ def passwordVerify(password: str, hashed_password: str):
             hash_len=32,  # 256-bit output
         ),
     ))
-    return hasher.verify(hashed_password, password)
+    try:
+        return hasher.verify(password, hashed_password)
+    except pwdlib_exceptions.UnknownHashError:
+        return False

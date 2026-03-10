@@ -93,18 +93,17 @@ export async function decrypt(encoded: string, secret: string): Promise<CryptoRe
     }
 }
 
-export function useLogout() {
-    const { setUser } = AppStore()
-    const navigate = useNavigate()
+export function getCookie(name: string): string | null {
+  const cookies = document.cookie.split('; ')
+  const cookie = cookies.find((c) => c.startsWith(`${name}=`))
+  if (!cookie) return null
 
-    const { mutate } = useMutateRequest<{ message: string }, undefined>({
-        url: "/auth/logout",
-        method: "POST",
-        onSuccess: () => {
-            setUser(null)
-            navigate("/login")
-        },
-    })
-
-    return () => mutate(undefined)
+  // Get the value after the first '=' and decode it
+  const value = cookie.substring(name.length + 1)
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    // If decoding fails, return the raw value
+    return value
+  }
 }

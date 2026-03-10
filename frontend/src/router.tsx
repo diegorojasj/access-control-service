@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import AuthorizedComponent from './core/AuthorizedComponent'
-import Login from './auth/application/login.application'
+import AuthRoute from './auth/auth.route'
 
 const router = createBrowserRouter([
     {
@@ -13,10 +13,7 @@ const router = createBrowserRouter([
             // },
         ],
     },
-    {
-        path: "/login",
-        element: <Login />,
-    },
+    ...AuthRoute(),
 ])
 
 export default router

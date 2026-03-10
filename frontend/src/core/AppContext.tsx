@@ -4,14 +4,34 @@ import type { AppContextType } from "./infrastructure/appContext.infrastructure"
 
 export const AppStore = create<AppContextType>((set) => ({
     user: null,
-    setUser: (user) => set({ user })
+    setUser: (user) => set({ user }),
+    // To Do List
+    openToDoListForm: false,
+    setOpenToDoListForm: (bool) => set({ openToDoListForm: bool }),
+    openToDoListTable: false,
+    setOpenToDoListTable: (bool) => set({ openToDoListTable: bool }),
+    // User Management
+    openUserManagementForm: false,
+    setOpenUserManagementForm: (bool) => set({ openUserManagementForm: bool }),
+    openUserManagementTable: false,
+    setOpenUserManagementTable: (bool) => set({ openUserManagementTable: bool }),
+    // Role Management
+    openRoleManagementForm: false,
+    setOpenRoleManagementForm: (bool) => set({ openRoleManagementForm: bool }),
+    openRoleManagementTable: false,
+    setOpenRoleManagementTable: (bool) => set({ openRoleManagementTable: bool }),
+    // Permission Management
+    openPermissionManagementForm: false,
+    setOpenPermissionManagementForm: (bool) => set({ openPermissionManagementForm: bool }),
+    openPermissionManagementTable: false,
+    setOpenPermissionManagementTable: (bool) => set({ openPermissionManagementTable: bool })
 }))
 
 const AppContext = ({ children }: { children: React.ReactNode }) => {
     return (
         <div>
             <Toaster
-                position="top-center"
+                position="bottom-center"
                 offset={10}
                 options={{
                     duration: 2750,

@@ -14,6 +14,8 @@ async def auth_exception_handler(request: Request, exc: AuthException) -> JSONRe
 
     response.delete_cookie(key="token")
     response.delete_cookie(key="expire_at")
+    response.delete_cookie(key="user")
+    response.delete_cookie(key="role")
     return response
 
 

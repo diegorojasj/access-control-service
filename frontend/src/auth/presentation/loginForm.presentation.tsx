@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
 import {
     Card,
-    CardAction,
     CardContent,
     CardDescription,
     CardFooter,
@@ -11,22 +10,20 @@ import {
 import { Input } from "@/components/ui/input"
 import { useMutateRequest } from "@/shared/useRequest"
 import { encode } from "@/shared/utils"
+import { useNavigate } from "react-router-dom"
 import { sileo } from "sileo"
 
 const LoginForm = () => {
     // Variables
+    const navigate = useNavigate()
     const request = useMutateRequest({
         url: '/auth/login',
         method: 'POST'
     })
 
     // Functions
-    const onSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    const onSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault()
-        sileo.success({
-            title: "Login successful",
-            description: "You are now logged in",
-        })
         const { username, password } = e.currentTarget as typeof e.currentTarget & {
             username: HTMLInputElement
             password: HTMLInputElement
@@ -34,11 +31,27 @@ const LoginForm = () => {
 
         const encodePassword = encode(password.value)
 
-        // request.mutate({
-        //     username: username.value,
-        //     password: encodePassword
-        // })
+        request.mutate({
+            username: username.value,
+            password: encodePassword
+        }, {
+            onSuccess: (response) => {
+                console.log(response)
+                sileo.success({
+                    title: "Login successful",
+                    description: "You are now logged in",
+                })
+                navigate('/')
+            },
+            onError: (error) => {
+                sileo.error({
+                    title: "Login failed",
+                    description: (error as Error).message,
+                })
+            }
+        })
     }
+
     return (
         <Card className="w-full max-w-sm p-6">
             <CardHeader>

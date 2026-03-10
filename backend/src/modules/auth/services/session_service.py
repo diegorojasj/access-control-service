@@ -25,4 +25,6 @@ class SessionService:
             token = generate_token_by_user(user)
             setCookie("token", token, response)
             setCookie("expire_at", expire_at.strftime("%a, %d-%b-%Y %H:%M:%S GMT"), response)
+            setCookie("user", user.username, response, httponly=False)
+            setCookie("role", user.role.name, response, httponly=False)
             return {"message": "Login successful"}
