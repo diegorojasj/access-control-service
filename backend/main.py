@@ -24,5 +24,4 @@ app.include_router(permissions_router)
 
 @app.get("/health")
 def read_root():
-    passwd = passwordHash("OTgtOTg=")
-    return {"status": passwd}
+    return {"status": "ok"}
