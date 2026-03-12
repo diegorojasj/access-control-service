@@ -8,8 +8,10 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Spinner } from "@/components/ui/spinner"
+import { AppStore } from "@/core/AppContext"
 import { useMutateRequest } from "@/shared/useRequest"
-import { encode } from "@/shared/utils"
+import { encode, getCookie } from "@/shared/utils"
 import { useNavigate } from "react-router-dom"
 import { sileo } from "sileo"
 
@@ -35,8 +37,12 @@ const LoginForm = () => {
             username: username.value,
             password: encodePassword
         }, {
-            onSuccess: (response) => {
-                console.log(response)
+            onSuccess: () => {
+                const name = getCookie("user")
+                const roleName = getCookie("role")
+                if (name && roleName) {
+                    AppStore.setState({ user: { name, roleName } })
+                }
                 sileo.success({
                     title: "Login successful",
                     description: "You are now logged in",
@@ -78,8 +84,8 @@ const LoginForm = () => {
                 </form>
             </CardContent>
             <CardFooter className="flex-col gap-2">
-                <Button type="submit" form="login-form" className="w-full">
-                    Login
+                <Button type="submit" form="login-form" className="w-full" disabled={request.isPending}>
+                    {request.isPending ? <Spinner /> : "Login"}
                 </Button>
             </CardFooter>
         </Card>
