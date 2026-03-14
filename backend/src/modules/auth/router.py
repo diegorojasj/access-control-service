@@ -1,4 +1,4 @@
-from src.modules.auth.services.user_service import UserService
+from src.modules.userManagement.services.user_service import UserService
 from src.modules.auth.services.session_service import SessionService
 from src.core.exceptions.authException import AuthException
 from src.security.token import verify_token
@@ -6,7 +6,6 @@ from fastapi import APIRouter, Request, Response, Cookie
 from typing import Optional
 
 session_router = APIRouter(prefix="/auth", tags=["auth_session"])
-user_router = APIRouter(prefix="/user", tags=["auth_user"])
 
 @session_router.post("/login")
 async def login(request: Request, response: Response):
@@ -33,9 +32,3 @@ def verify(token: Optional[str] = Cookie(default=None)):
         raise AuthException(status_code=401, detail="Invalid or expired token")
 
     return {"id": payload.get("sub"), "role": payload.get("role")}
-
-
-@user_router.get("/list")
-async def user_list():
-    service = UserService()
-    return service.list()

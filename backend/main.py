@@ -1,5 +1,6 @@
 from src.shared.utils import passwordHash
-from src.modules.auth.router import session_router, user_router
+from src.modules.auth.router import session_router
+from src.modules.userManagement.router import user_router
 from src.core.entities_registry import register_entities
 from src.core.handlers import register_exception_handlers
 from src.modules.permissions.router import router as permissions_router

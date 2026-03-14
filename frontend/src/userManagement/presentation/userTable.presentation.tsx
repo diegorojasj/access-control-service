@@ -22,13 +22,13 @@ const UserTable = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {request.data?.map((user)=><TableRow>
+                    {request.data?.map((user) => <TableRow>
                         <TableCell>{user.username}</TableCell>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.role}</TableCell>
-                        <TableCell>
-                            <Button>Edit</Button>
-                            <Button>Delete</Button>
+                        <TableCell className="flex gap-2" >
+                            <Button className="bg-green-400 hover:bg-green-500 text-white" size="sm" variant="secondary" >Edit</Button>
+                            <Button className="bg-red-400 hover:bg-red-500 text-white" size="sm" variant="secondary" >Delete</Button>
                         </TableCell>
                     </TableRow>)}
                 </TableBody>
