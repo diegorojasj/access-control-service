@@ -9,6 +9,24 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 
+// ─── Z-index manager ────────────────────────────────────────────────────────
+const BASE_Z = 1400;
+const MAX_Z  = 1500;
+
+type ModalEntry = { getZ: () => number; setZ: (z: number) => void };
+const modalRegistry = new Set<ModalEntry>();
+let highestModalZ = BASE_Z;
+
+const normalizeZIndices = () => {
+  modalRegistry.forEach(entry => entry.setZ(BASE_Z + 1));
+  highestModalZ = BASE_Z + 1;
+};
+
+const claimNextZ = (): number => {
+  if (highestModalZ >= MAX_Z) normalizeZIndices();
+  return ++highestModalZ;
+};
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 interface DraggableModalProps {
   open: boolean;
@@ -25,12 +43,14 @@ interface DraggableModalProps {
 interface DraggablePaperProps {
   position: { x: number; y: number };
   onDrag: (pos: { x: number; y: number }) => void;
+  onBringToFront: () => void;
   topbar: ReactNode;
   bottombar?: ReactNode;
   content: ReactNode;
   maxWidth: number;
   actualWidth: number;
   actualHeight: number;
+  zIndex: number;
 }
 
 // ─── Responsive width helper ────────────────────────────────────────────────
@@ -132,34 +152,41 @@ const DraggablePaper = memo(
   ({
     position,
     onDrag,
+    onBringToFront,
     topbar,
     bottombar,
     content,
     maxWidth,
     actualWidth,
     actualHeight,
+    zIndex,
   }: DraggablePaperProps) => {
     const isDragging = useRef(false);
 
+    const clampPosition = useCallback(
+      (x: number, y: number) => {
+        const maxX = window.innerWidth - Math.min(200, actualWidth / 2);
+        const maxY = window.innerHeight - Math.min(70, actualHeight / 2);
+        const minX = -actualWidth + Math.min(200, actualWidth / 2);
+        const minY = -30;
+        return {
+          x: Math.min(maxX, Math.max(minX, x)),
+          y: Math.min(maxY, Math.max(minY, y)),
+        };
+      },
+      [actualWidth, actualHeight]
+    );
+
     const handleMouseDown = useCallback(
       (event: React.MouseEvent) => {
+        onBringToFront();
         isDragging.current = true;
         const startX = event.clientX - position.x;
         const startY = event.clientY - position.y;
 
         const onMouseMove = (e: MouseEvent) => {
           if (!isDragging.current) return;
-          let newX = e.clientX - startX;
-          let newY = e.clientY - startY;
-
-          const maxX = window.innerWidth - Math.min(200, actualWidth / 2);
-          const maxY = window.innerHeight - Math.min(70, actualHeight / 2);
-          const minX = -actualWidth + Math.min(200, actualWidth / 2);
-          const minY = -30;
-
-          newX = Math.min(maxX, Math.max(minX, newX));
-          newY = Math.min(maxY, Math.max(minY, newY));
-          onDrag({ x: newX, y: newY });
+          onDrag(clampPosition(e.clientX - startX, e.clientY - startY));
         };
 
         const onMouseUp = () => {
@@ -171,7 +198,36 @@ const DraggablePaper = memo(
         document.addEventListener("mousemove", onMouseMove);
         document.addEventListener("mouseup", onMouseUp);
       },
-      [position, onDrag, actualWidth, actualHeight]
+      [position, onDrag, clampPosition, onBringToFront]
+    );
+
+    const handleTouchStart = useCallback(
+      (event: React.TouchEvent) => {
+        onBringToFront();
+        const touch = event.touches[0];
+        if (!touch) return;
+        isDragging.current = true;
+        const startX = touch.clientX - position.x;
+        const startY = touch.clientY - position.y;
+
+        const onTouchMove = (e: TouchEvent) => {
+          if (!isDragging.current) return;
+          e.preventDefault();
+          const t = e.touches[0];
+          if (!t) return;
+          onDrag(clampPosition(t.clientX - startX, t.clientY - startY));
+        };
+
+        const onTouchEnd = () => {
+          isDragging.current = false;
+          document.removeEventListener("touchmove", onTouchMove);
+          document.removeEventListener("touchend", onTouchEnd);
+        };
+
+        document.addEventListener("touchmove", onTouchMove, { passive: false });
+        document.addEventListener("touchend", onTouchEnd);
+      },
+      [position, onDrag, clampPosition, onBringToFront]
     );
 
     const cardStyle = useMemo<CSSProperties>(
@@ -182,9 +238,9 @@ const DraggablePaper = memo(
         maxWidth,
         width: "auto",
         maxHeight: "90vh",
-        zIndex: 1400,
+        zIndex,
       }),
-      [position, maxWidth]
+      [position, maxWidth, zIndex]
     );
 
     return (
@@ -195,6 +251,7 @@ const DraggablePaper = memo(
         {/* Header — drag handle */}
         <CardHeader
           onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
           role="toolbar"
           aria-label="Draggable modal header"
           className="cursor-move select-none flex flex-row items-center justify-between space-y-0 border-b px-3 !py-1.5"
@@ -236,6 +293,22 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
   dismissible = true,
 }) => {
   const [minimized, setMinimized] = useState(false);
+  const zIndexRef = useRef(0);
+  const [zIndex, setZIndex] = useState(() => {
+    const z = claimNextZ();
+    zIndexRef.current = z;
+    return z;
+  });
+
+  useEffect(() => {
+    const entry: ModalEntry = {
+      getZ: () => zIndexRef.current,
+      setZ: (z) => { zIndexRef.current = z; setZIndex(z); },
+    };
+    modalRegistry.add(entry);
+    return () => { modalRegistry.delete(entry); };
+  }, []);
+
   const dimensions = useResponsiveDimensions(width);
   const [position, setPosition] = useModalPosition(
     open,
@@ -268,6 +341,12 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
     (pos: { x: number; y: number }) => setPosition(pos),
     [setPosition]
   );
+
+  const handleBringToFront = useCallback(() => {
+    const z = claimNextZ();
+    zIndexRef.current = z;
+    setZIndex(z);
+  }, []);
 
   const handleMinimize = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -348,9 +427,11 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
         actualHeight={minimized ? 50 : dimensions.height}
         position={position}
         onDrag={handleDrag}
+        onBringToFront={handleBringToFront}
         topbar={topbarContent}
         content={contentWrapper}
         bottombar={!minimized ? bottomBar : undefined}
+        zIndex={zIndex}
       />
     </>
   );

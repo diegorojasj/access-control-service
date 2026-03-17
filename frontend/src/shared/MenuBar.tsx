@@ -41,7 +41,7 @@ const MenuBar = () => {
             </div>
 
             {/* Mobile */}
-            <div className="md:hidden">
+            <div className="md:hidden relative z-[9999]">
                 <div className="flex items-center justify-between border rounded-md px-3 py-2 bg-background">
                     <span className="text-sm font-medium">{user?.name}({user?.roleName})</span>
                     <button
@@ -54,7 +54,7 @@ const MenuBar = () => {
                 </div>
 
                 {open && (
-                    <div className="mt-1 border rounded-md bg-background shadow-md overflow-hidden">
+                    <div className="absolute w-full mt-1 border rounded-md bg-background shadow-md overflow-hidden">
                         {menuItems.map((item) => (
                             <div key={item.label} className="border-b last:border-b-0">
                                 <button
