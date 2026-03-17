@@ -24,7 +24,18 @@ export const AppStore = create<AppContextType>((set) => ({
     openPermissionManagementForm: false,
     setOpenPermissionManagementForm: (bool) => set({ openPermissionManagementForm: bool }),
     openPermissionManagementTable: false,
-    setOpenPermissionManagementTable: (bool) => set({ openPermissionManagementTable: bool })
+    setOpenPermissionManagementTable: (bool) => set({ openPermissionManagementTable: bool }),
+    reset: () => set({
+        user: null,
+        openToDoListForm: false,
+        openToDoListTable: false,
+        openUserManagementForm: false,
+        openUserManagementTable: false,
+        openRoleManagementForm: false,
+        openRoleManagementTable: false,
+        openPermissionManagementForm: false,
+        openPermissionManagementTable: false
+    })
 }))
 
 const AppContext = ({ children }: { children: React.ReactNode }) => {

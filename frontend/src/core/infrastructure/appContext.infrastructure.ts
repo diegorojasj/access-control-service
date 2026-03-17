@@ -23,4 +23,6 @@ export interface AppContextType {
     setOpenPermissionManagementForm: (bool: boolean) => void
     openPermissionManagementTable: boolean
     setOpenPermissionManagementTable: (bool: boolean) => void
+    // Reset
+    reset: () => void
 }
