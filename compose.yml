@@ -42,7 +42,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: podman/containerfiles/backend.containerfile
+      dockerfile: containers/containerfiles/backend.containerfile
     ports:
       - "8000:8000"
     volumes:
@@ -68,7 +68,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: podman/containerfiles/web.containerfile
+      dockerfile: containers/containerfiles/web.containerfile
     profiles: ["PROD"]
     ports:
       - "80:80"

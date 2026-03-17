@@ -18,7 +18,7 @@ A standalone RBAC microservice with FastAPI. Features: user/role/permission mana
 
 **Database:** PostgreSQL
 
-**Tools:** Podman Compose
+**Tools:** Podman Compose / Docker Compose
 
 ## Project Structure
 Poman Containers:

@@ -1,7 +1,5 @@
-import json
 from pathlib import Path
-from typing import Any, Dict, Optional, cast
-from pyseto import DecryptError, Key, Paseto, VerifyError
+from pyseto import Key, Paseto
 
 # Configure Paseto defaults:
 # - tokens include `iat`

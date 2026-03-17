@@ -1,7 +1,6 @@
 import json
-from pathlib import Path
 from typing import Any, Dict, Optional, cast
-from pyseto import DecryptError, Key, Paseto, VerifyError
+from pyseto import DecryptError, VerifyError
 from .config import PRIVATE_KEY, PUBLIC_KEY, paseto
 
 def create_access_token(

@@ -13,7 +13,7 @@ COPY backend/ /app/
 # Expose backend port
 EXPOSE 8000
 
-COPY podman/entrypoints/entrypoint-python.sh /entrypoint.sh
+COPY containers/entrypoints/entrypoint-python.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
