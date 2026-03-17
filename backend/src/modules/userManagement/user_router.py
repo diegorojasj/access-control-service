@@ -11,9 +11,9 @@ async def user_list():
 @user_router.post("/create")
 async def user_create(request: Request):
     service = UserService()
-    return service.create(request)
+    return await service.create(request)
 
 @user_router.post("/update")
 async def user_update(request: Request):
     service = UserService()
-    return service.update(request)
+    return await service.update(request)

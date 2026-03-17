@@ -1,7 +1,7 @@
 from src.shared.baseModel import Base
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from src.modules.permissions.infrastructure.entities.role_entity import Role
+from src.modules.roleManagement.infrastructure.entities.role_entity import Role
 
 class User(Base):
     __tablename__ = "user"

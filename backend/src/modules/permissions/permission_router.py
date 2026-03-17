@@ -4,9 +4,9 @@ from pydantic import BaseModel
 from typing import Optional
 
 from src.core.database import get_db
-from src.modules.permissions.infrastructure.repositories.role_repository import RoleRepository
+from src.modules.roleManagement.infrastructure.repositories.role_repository import RoleRepository
 from src.modules.permissions.infrastructure.repositories.permission_repository import PermissionRepository
-from src.modules.permissions.infrastructure.entities.role_entity import Role
+from src.modules.roleManagement.infrastructure.entities.role_entity import Role
 from src.modules.permissions.infrastructure.entities.permission_entity import Permission
 
 router = APIRouter()

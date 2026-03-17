@@ -1,14 +1,15 @@
-from src.modules.permissions.infrastructure.entities.role_entity import Role
+from src.modules.roleManagement.infrastructure.entities.role_entity import Role
 
 class RoleRepository:
     def __init__(self, session):
         self.session = session
 
     def get_all(self):
-        return self.session.query(Role).all()
+        rows = self.session.query(Role.id, Role.name, Role.description).all()
+        return [row._asdict() for row in rows]
 
     def get_by_id(self, id):
-        return self.session.query(Role).filter(Role.id == id).first()
+        return self.session.query(Role.id, Role.name, Role.description).filter(Role.id == id).first()
 
     def get_by_name(self, name):
         return self.session.query(Role).filter(Role.name == name).first()
