@@ -17,3 +17,8 @@ async def user_create(request: Request):
 async def user_update(request: Request):
     service = UserService()
     return await service.update(request)
+
+@user_router.post("/delete")
+async def user_delete(request: Request):
+    service = UserService()
+    return await service.delete(request)

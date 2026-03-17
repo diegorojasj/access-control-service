@@ -1,3 +1,4 @@
+from src.modules.userManagement.infrastructure.types.user_types import delete_requestType
 from src.modules.userManagement.infrastructure.types.user_types import update_requestType
 from src.modules.userManagement.infrastructure.types.user_types import create_requestType
 from src.modules.auth.infrastructure.entities.user_entity import User
@@ -40,3 +41,12 @@ class UserService:
             )
             userRepository.update(user)
             return {"message": "User updated successfully"}
+
+    async def delete(self, request):
+        json_data = await request.json()
+        data = delete_requestType(**json_data)
+        with Session() as session:
+            userRepository = UserRepository(session)
+            user = userRepository.get_by_id(data.id)
+            userRepository.delete(user)
+            return {"message": "User deleted successfully"}

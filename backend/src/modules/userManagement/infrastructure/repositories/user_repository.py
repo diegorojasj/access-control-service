@@ -21,6 +21,9 @@ class UserRepository:
         self.session.commit()
         return user
 
+    def get_by_id(self, id):
+        return self.session.query(User).filter(User.id == id).first()
+
     def delete(self, user):
         self.session.delete(user)
         self.session.commit()

@@ -4,14 +4,14 @@ import { AppStore } from "@/core/AppContext"
 import { useNavigate } from "react-router-dom"
 
 const MenuBar = () => {
-    const { user, setOpenUserManagementTable } = AppStore()
+    const { user, setOpenUserManagementTable, setOpenUserManagementForm } = AppStore()
     const navigate = useNavigate()
     const [open, setOpen] = useState(false)
     const [expanded, setExpanded] = useState<string | null>(null)
 
     const menuItems = [
         { label: "To Do List", children: [{ label: "New", onClick: undefined }, { label: "View", onClick: undefined }] },
-        { label: "User Management", children: [{ label: "New", onClick: undefined }, { label: "View", onClick: () => setOpenUserManagementTable(true) }] },
+        { label: "User Management", children: [{ label: "New", onClick: () => setOpenUserManagementForm(true) }, { label: "View", onClick: () => setOpenUserManagementTable(true) }] },
         { label: "Role Management", children: [{ label: "New", onClick: undefined }, { label: "View", onClick: undefined }] },
         { label: "Permission Management", children: [{ label: "New", onClick: undefined }, { label: "View", onClick: undefined }] },
     ]

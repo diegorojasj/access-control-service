@@ -15,3 +15,7 @@ class update_requestType(baseType):
     username: str
     password: str
     role: str
+
+@dataclass
+class delete_requestType(baseType):
+    id: int

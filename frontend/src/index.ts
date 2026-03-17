@@ -17,6 +17,7 @@ const server = serve({
   routes: {
     "/auth/*": proxyToBackend,
     "/user/*": proxyToBackend,
+    "/role/*": proxyToBackend,
     "/*": index,
   },
 

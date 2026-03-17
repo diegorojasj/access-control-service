@@ -1,11 +1,12 @@
 import { lazy, Suspense } from "react"
 import MenuBar from "@/shared/MenuBar"
 import { AppStore } from "./AppContext"
+import UserFormApplication from "@/userManagement/application/userForm.application";
 
 const UserTableApplication = lazy(() => import("@/userManagement/application/userTable.application"))
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-    const { openUserManagementTable } = AppStore()
+    const { openUserManagementTable, openUserManagementForm } = AppStore()
 
     return (
         <div className="min-h-screen flex flex-col pt-4 px-4">
@@ -20,6 +21,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     <UserTableApplication />
                 </Suspense>
             )}
+            {
+                openUserManagementForm && (
+                    <Suspense fallback={null}>
+                        <UserFormApplication />
+                    </Suspense>
+                )
+            }
         </div>
     );
 };

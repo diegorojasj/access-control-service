@@ -47,6 +47,8 @@ export function useAutoRequest<T = unknown>(options: UseAutoRequestOptions<T>) {
     return useQuery<T>({
         queryKey,
         queryFn: () => request<T>({ url, method, headers }),
+        refetchInterval: 25_000,
+        refetchIntervalInBackground: false,
         ...queryOptions,
     })
 }
