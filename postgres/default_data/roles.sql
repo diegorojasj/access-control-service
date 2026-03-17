@@ -5,3 +5,5 @@ VALUES
 (3, 'readonly', 'Readonly User', NOW(), NOW())
 ON CONFLICT (id) 
 DO NOTHING;
+
+SELECT setval(pg_get_serial_sequence('public.roles', 'id'), (SELECT MAX(id) FROM public.roles));
