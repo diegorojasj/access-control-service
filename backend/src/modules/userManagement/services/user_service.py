@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from src.modules.userManagement.infrastructure.types.user_types import delete_requestType
 from src.modules.userManagement.infrastructure.types.user_types import update_requestType
 from src.modules.userManagement.infrastructure.types.user_types import create_requestType
@@ -32,6 +33,9 @@ class UserService:
         data = update_requestType(**json_data)
         with Session() as session:
             userRepository = UserRepository(session)
+            userVerification = userRepository.get_by_username(data.username)
+            if userVerification is not None and userVerification.id != data.id:
+                raise HTTPException(status_code=400, detail="Username already exists")
             user = User(
                 id=data.id,
                 name=data.name,
@@ -42,11 +46,12 @@ class UserService:
             userRepository.update(user)
             return {"message": "User updated successfully"}
 
-    async def delete(self, request):
+    async def status_change(self, request):
         json_data = await request.json()
         data = delete_requestType(**json_data)
         with Session() as session:
             userRepository = UserRepository(session)
             user = userRepository.get_by_id(data.id)
-            userRepository.delete(user)
-            return {"message": "User deleted successfully"}
+            user.status = 0 if user.status == 1 else 1
+            userRepository.update(user)
+            return {"message": "User status changed successfully"}

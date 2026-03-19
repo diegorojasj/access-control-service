@@ -8,8 +8,8 @@ class UserRepository:
         rows = self.session.query(User.id, User.name, User.username, User._role.label("role")).all()
         return [row._asdict() for row in rows]
 
-    def get_by_name(self, name):
-        return self.session.query(User.id, User.name, User.username, User._role.label("role")).filter(User.name == name).first()
+    def get_by_username(self, username):
+        return self.session.query(User.id, User.name, User.username, User._role.label("role")).filter(User.username == username).first()
 
     def create(self, user):
         self.session.add(user)
@@ -24,7 +24,7 @@ class UserRepository:
     def get_by_id(self, id):
         return self.session.query(User).filter(User.id == id).first()
 
-    def delete(self, user):
-        self.session.delete(user)
-        self.session.commit()
-        return user
+    # def delete(self, user):
+    #     self.session.delete(user)
+    #     self.session.commit()
+    #     return user

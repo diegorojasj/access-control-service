@@ -15,7 +15,7 @@ class SessionService:
         with Session() as session:
             sessionRepository = SessionRepository(session)
             user = sessionRepository.verifyLogin(data.username, data.password)
-            if user is None:
+            if user is None or user.status == 0:
                 raise AuthException(
                     status_code=401, 
                     detail={"message": "Invalid credentials", "error": "INVALID_CREDENTIALS"}

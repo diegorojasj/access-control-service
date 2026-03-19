@@ -12,31 +12,48 @@ const UserTable = () => {
         url: "/user/list"
     })
 
-    const deleteRequest = useMutateRequest<UserType[]>({
-        url: "/user/delete",
+    const statusChangeRequest = useMutateRequest<UserType[]>({
+        url: "/user/status-change",
         method: "POST"
     })
 
-    const onDelete = (id: number) => {
-        deleteRequest.mutate({
+    const onStatusChange = (id: number) => {
+        statusChangeRequest.mutate({
             id
         }, {
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ["users"] })
                 sileo.success({
-                    title: "User deleted successfully",
-                    description: "The user has been deleted.",
+                    title: "User status changed successfully",
+                    description: "The user has been status changed.",
                 })
             },
             onError: (error) => {
                 sileo.error({
-                    title: "User deletion failed",
+                    title: "User status change failed",
                     description: (error as Error).message,
                 })
             }
         })
     }
 
+const renderUserData = (user: UserType) => {
+        let buttonStatusText = "Suspend"
+        let buttonStatusColor = "red-400"
+        if (user.status == 0) {
+            buttonStatusText = "Activate"
+            buttonStatusColor = "green-400"
+        }
+        return <TableRow key={user.id}>
+            <TableCell>{user.username}</TableCell>
+            <TableCell>{user.name}</TableCell>
+            <TableCell>{user.role}</TableCell>
+            <TableCell className="flex gap-2" >
+                <Button className="bg-green-400 hover:bg-green-500 text-white" size="sm" variant="secondary" >Edit</Button>
+                <Button className={`bg-${buttonStatusColor} hover:bg-${buttonStatusColor} text-white`} size="sm" variant="secondary" onClick={() => onStatusChange(user.id)} >{buttonStatusText}</Button>
+            </TableCell>
+        </TableRow>
+    }
     return (
         <div>
             <Table>
@@ -50,15 +67,7 @@ const UserTable = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {request.data?.map((user) => <TableRow>
-                        <TableCell>{user.username}</TableCell>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>{user.role}</TableCell>
-                        <TableCell className="flex gap-2" >
-                            <Button className="bg-green-400 hover:bg-green-500 text-white" size="sm" variant="secondary" >Edit</Button>
-                            <Button className="bg-red-400 hover:bg-red-500 text-white" size="sm" variant="secondary" onClick={() => onDelete(user.id)} >Delete</Button>
-                        </TableCell>
-                    </TableRow>)}
+                    {request.data?.map((user) => renderUserData(user))}
                 </TableBody>
             </Table>
         </div>
