@@ -11,15 +11,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { RoleType } from "@/roleManagement/infrastructure/roleType.infrastructure"
 import { Eye, EyeOff } from "lucide-react"
 
-const UserForm = ({ edit }: { edit?: boolean }) => {
+const UserForm = ({ user, onSuccess }: { user?: UserType, onSuccess?: () => void }) => {
     const queryClient = useQueryClient()
-    const [role, setRole] = useState("")
+    const [role, setRole] = useState(user?.role ?? "")
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false)
     const [passwordError, setPasswordError] = useState<string | null>(null)
 
     const request = useMutateRequest<UserType[]>({
-        url: edit ? "/user/update" : "/user/create",
+        url: user ? "/user/update" : "/user/create",
         method: "POST"
     })
 
@@ -35,35 +35,47 @@ const UserForm = ({ edit }: { edit?: boolean }) => {
             name: HTMLInputElement
             username: HTMLInputElement
             password: HTMLInputElement
+            current_password: HTMLInputElement
             confirm: HTMLInputElement
         }
 
         const password = form.password.value
+        let current_password = null
+        if (password && password !== "" && user) {
+            current_password = form.current_password.value
+            if (current_password !== "") {
+                setPasswordError("The current password is required to update the password")
+                return
+            }
+        }
         const confirm = form.confirm.value
 
-        if (password !== confirm) {
+        if ((!user && password !== confirm) || (user && password && password !== "" && password !== confirm)) {
             setPasswordError("Passwords do not match")
             return
         }
         setPasswordError(null)
 
         request.mutate({
+            id: user?.id,
             name: form.name.value,
             username: form.username.value,
-            password: encode(password),
+            password: password && password !== "" ? encode(password) : undefined,
+            current_password: current_password && current_password !== "" ? encode(current_password) : undefined,
             role,
         }, {
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ["users"] })
                 sileo.success({
-                    title: edit ? "User updated successfully" : "User created successfully",
-                    description: edit ? "The user has been updated." : "The user has been created.",
+                    title: user ? "User updated successfully" : "User created successfully",
+                    description: user ? "The user has been updated." : "The user has been created.",
                 })
                 form.reset()
+                onSuccess?.()
             },
             onError: (error) => {
                 sileo.error({
-                    title: edit ? "User update failed" : "User creation failed",
+                    title: user ? "User update failed" : "User creation failed",
                     description: (error as Error).message,
                 })
             }
@@ -71,21 +83,21 @@ const UserForm = ({ edit }: { edit?: boolean }) => {
     }
 
     return (
-        <div className="p-4">
+        <div className="p-2">
             <form id="user-form" onSubmit={onSubmit}>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
 
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-1">
                         <label htmlFor="name" className="text-sm font-medium">Name</label>
-                        <Input id="name" name="name" type="text" placeholder="Full name" required />
+                        <Input id="name" name="name" type="text" placeholder="Full name" defaultValue={user?.name} required />
                     </div>
 
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-1">
                         <label htmlFor="username" className="text-sm font-medium">Username</label>
-                        <Input id="username" name="username" type="text" placeholder="Username" required />
+                        <Input id="username" name="username" type="text" placeholder="Username" defaultValue={user?.username} required />
                     </div>
 
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-1">
                         <label className="text-sm font-medium">Role</label>
                         <Select value={role} onValueChange={setRole} required>
                             <SelectTrigger className="w-full">
@@ -99,7 +111,29 @@ const UserForm = ({ edit }: { edit?: boolean }) => {
                         </Select>
                     </div>
 
-                    <div className="flex flex-col gap-1.5">
+                    {user && <div className="flex flex-col gap-1">
+                        <label htmlFor="current_password" className="text-sm font-medium">Current Password</label>
+                        <div className="relative">
+                            <Input
+                                id="current_password"
+                                name="current_password"
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Current Password"
+                                className="pr-10"
+                                required={!user}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword((v) => !v)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                            </button>
+                        </div>
+                    </div>}
+
+                    <div className="flex flex-col gap-1">
                         <label htmlFor="password" className="text-sm font-medium">Password</label>
                         <div className="relative">
                             <Input
@@ -108,7 +142,7 @@ const UserForm = ({ edit }: { edit?: boolean }) => {
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Password"
                                 className="pr-10"
-                                required
+                                required={!user}
                             />
                             <button
                                 type="button"
@@ -121,7 +155,7 @@ const UserForm = ({ edit }: { edit?: boolean }) => {
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-1">
                         <label htmlFor="confirm" className="text-sm font-medium">Confirm password</label>
                         <div className="relative">
                             <Input
@@ -130,7 +164,7 @@ const UserForm = ({ edit }: { edit?: boolean }) => {
                                 type={showConfirm ? "text" : "password"}
                                 placeholder="Confirm password"
                                 className="pr-10"
-                                required
+                                required={!user}
                             />
                             <button
                                 type="button"
@@ -146,8 +180,8 @@ const UserForm = ({ edit }: { edit?: boolean }) => {
                         )}
                     </div>
 
-                    <Button type="submit" form="user-form" className="w-full mt-2" disabled={request.isPending}>
-                        {request.isPending ? <Spinner /> : edit ? "Save changes" : "Create user"}
+                    <Button type="submit" form="user-form" className="w-full" disabled={request.isPending}>
+                        {request.isPending ? <Spinner /> : user ? "Save changes" : "Create user"}
                     </Button>
 
                 </div>

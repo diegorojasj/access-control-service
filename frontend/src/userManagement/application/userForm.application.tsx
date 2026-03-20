@@ -7,7 +7,7 @@ const UserFormApplication = () => {
     const onClose = () => {
         setOpenUserManagementForm(false)
     }
-    return <DraggableModal title="User View" width={1000} backdrop={false} open={open} onClose={onClose} >
+    return <DraggableModal title="New User" width={1000} backdrop={false} open={open} onClose={onClose} >
         <UserForm />
     </DraggableModal>
 }

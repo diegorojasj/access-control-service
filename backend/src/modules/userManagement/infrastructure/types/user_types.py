@@ -13,8 +13,9 @@ class update_requestType(baseType):
     id: int
     name: str
     username: str
-    password: str
     role: str
+    password: str | None = None
+    current_password: str | None = None
 
 @dataclass
 class delete_requestType(baseType):

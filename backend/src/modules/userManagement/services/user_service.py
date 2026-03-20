@@ -1,3 +1,4 @@
+from src.shared.utils import passwordVerify
 from fastapi import HTTPException
 from src.modules.userManagement.infrastructure.types.user_types import delete_requestType
 from src.modules.userManagement.infrastructure.types.user_types import update_requestType
@@ -36,13 +37,18 @@ class UserService:
             userVerification = userRepository.get_by_username(data.username)
             if userVerification is not None and userVerification.id != data.id:
                 raise HTTPException(status_code=400, detail="Username already exists")
-            user = User(
-                id=data.id,
-                name=data.name,
-                username=data.username,
-                password=passwordHash(data.password),
-                _role=data.role
-            )
+            user = userRepository.get_by_id(data.id)
+            if user is None:
+                raise HTTPException(status_code=404, detail="User not found")
+            user.name = data.name
+            user.username = data.username
+            user._role = data.role
+            if data.password and data.password != "":
+                if not data.current_password:
+                    raise HTTPException(status_code=400, detail="The current password is required")
+                if not passwordVerify(data.current_password, user.password):
+                    raise HTTPException(status_code=400, detail="Invalid current password")
+                user.password = passwordHash(data.password)
             userRepository.update(user)
             return {"message": "User updated successfully"}
 
