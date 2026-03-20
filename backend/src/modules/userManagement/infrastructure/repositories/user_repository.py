@@ -5,7 +5,7 @@ class UserRepository:
         self.session = session
 
     def get_all(self):
-        rows = self.session.query(User.id, User.name, User.username, User._role.label("role")).all()
+        rows = self.session.query(User.id, User.name, User.username, User._role.label("role"), User.status).order_by(User.id).all()
         return [row._asdict() for row in rows]
 
     def get_by_username(self, username):

@@ -38,19 +38,25 @@ const UserTable = () => {
     }
 
 const renderUserData = (user: UserType) => {
-        let buttonStatusText = "Suspend"
-        let buttonStatusColor = "red-400"
-        if (user.status == 0) {
-            buttonStatusText = "Activate"
-            buttonStatusColor = "green-400"
-        }
+        const isSuspend = user.status == 1
         return <TableRow key={user.id}>
             <TableCell>{user.username}</TableCell>
             <TableCell>{user.name}</TableCell>
             <TableCell>{user.role}</TableCell>
+            <TableCell>{isSuspend ? "Active" : "Inactive"}</TableCell>
             <TableCell className="flex gap-2" >
-                <Button className="bg-green-400 hover:bg-green-500 text-white" size="sm" variant="secondary" >Edit</Button>
-                <Button className={`bg-${buttonStatusColor} hover:bg-${buttonStatusColor} text-white`} size="sm" variant="secondary" onClick={() => onStatusChange(user.id)} >{buttonStatusText}</Button>
+                <Button className="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-white" size="sm" variant="secondary" >Edit</Button>
+                <Button
+                    className={isSuspend
+                        ? "bg-transparent border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                        : "bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-white"
+                    }
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => onStatusChange(user.id)}
+                >
+                    {isSuspend ? "Suspend" : "Activate"}
+                </Button>
             </TableCell>
         </TableRow>
     }
@@ -63,6 +69,7 @@ const renderUserData = (user: UserType) => {
                         <TableHead>Username</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Role</TableHead>
+                        <TableHead>Status</TableHead>
                         <TableHead>Actions</TableHead>
                     </TableRow>
                 </TableHeader>
