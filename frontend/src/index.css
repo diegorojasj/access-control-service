@@ -42,6 +42,10 @@ body::before {
   }
 }
 
+[data-sileo-viewport] {
+  z-index: 9999 !important;
+}
+
 @media (prefers-reduced-motion) {
   *,
   ::before,

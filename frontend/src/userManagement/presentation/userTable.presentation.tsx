@@ -25,22 +25,34 @@ const UserTable = () => {
         setEditUser(user)
     }
 
-    const onStatusChange = (id: number) => {
-        statusChangeRequest.mutate({
-            id
-        }, {
-            onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ["users"] })
-                sileo.success({
-                    title: "User status changed successfully",
-                    description: "The user has been status changed.",
-                })
-            },
-            onError: (error) => {
-                sileo.error({
-                    title: "User status change failed",
-                    description: (error as Error).message,
-                })
+    const onStatusChange = (user: UserType) => {
+        const isSuspend = user.status == 1
+        sileo.action({
+            title: isSuspend ? "Suspend user?" : "Activate user?",
+            description: isSuspend
+                ? `"${user.name}" will be suspended and lose access.`
+                : `"${user.name}" will be activated and regain access.`,
+            duration: null,
+            button: {
+                title: "Confirm",
+                onClick: () => {
+                    sileo.clear("bottom-center")
+                    statusChangeRequest.mutate({ id: user.id }, {
+                        onSuccess: () => {
+                            queryClient.invalidateQueries({ queryKey: ["users"] })
+                            sileo.success({
+                                title: "User status changed successfully",
+                                description: "The user has been status changed.",
+                            })
+                        },
+                        onError: (error) => {
+                            sileo.error({
+                                title: "User status change failed",
+                                description: (error as Error).message,
+                            })
+                        }
+                    })
+                }
             }
         })
     }
@@ -67,7 +79,7 @@ const UserTable = () => {
                     }
                     size="sm"
                     variant="secondary"
-                    onClick={() => onStatusChange(user.id)}
+                    onClick={() => onStatusChange(user)}
                 >
                     {isSuspend ? "Suspend" : "Activate"}
                 </Button>
