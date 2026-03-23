@@ -2,11 +2,17 @@ import { lazy, Suspense, useEffect } from "react"
 import MenuBar from "@/shared/MenuBar"
 import { AppStore } from "./AppContext"
 import UserFormApplication from "@/userManagement/application/userForm.application";
+import TodoListTableApplication from "@/todoList/application/todoListTable.application";
+import TodoListFormApplication from "@/todoList/application/todoListForm.application";
 
 const UserTableApplication = lazy(() => import("@/userManagement/application/userTable.application"))
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-    const { openUserManagementTable, openUserManagementForm, reset } = AppStore()
+    const {
+        openUserManagementTable, openUserManagementForm,
+        openToDoListTable, openToDoListForm,
+        reset,
+    } = AppStore()
 
     useEffect(() => {
         return () => {
@@ -32,8 +38,17 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     <Suspense fallback={null}>
                         <UserFormApplication />
                     </Suspense>
-                )
-            }
+            )}
+            {openToDoListTable && (
+                <Suspense fallback={null}>
+                    <TodoListTableApplication />
+                </Suspense>
+            )}
+            {openToDoListForm && (
+                <Suspense fallback={null}>
+                    <TodoListFormApplication />
+                </Suspense>
+            )}
         </div>
     );
 };
