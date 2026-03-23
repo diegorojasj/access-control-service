@@ -20,6 +20,9 @@ class UserService:
         data = create_requestType(**json_data)
         with Session() as session:
             userRepository = UserRepository(session)
+            user = userRepository.get_by_username(data.username)
+            if user:
+                raise HTTPException(status_code=400, detail="User already exists")
             user = User(
                 name=data.name,
                 username=data.username,
@@ -37,6 +40,9 @@ class UserService:
             userVerification = userRepository.get_by_username(data.username)
             if userVerification is not None and userVerification.id != data.id:
                 raise HTTPException(status_code=400, detail="Username already exists")
+            user = userRepository.get_by_username(data.username)
+            if user:
+                raise HTTPException(status_code=400, detail="User already exists")
             user = userRepository.get_by_id(data.id)
             if user is None:
                 raise HTTPException(status_code=404, detail="User not found")

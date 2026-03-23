@@ -18,6 +18,9 @@ class RoleService:
         data = create_requestType(**json_data)
         with Session() as session:
             roleRepository = RoleRepository(session)
+            role = roleRepository.get_by_name(data.name)
+            if role:
+                raise HTTPException(status_code=400, detail="Role already exists")
             role = Role(
                 name=data.name,
                 description=data.description
@@ -30,6 +33,9 @@ class RoleService:
         data = update_requestType(**json_data)
         with Session() as session:
             roleRepository = RoleRepository(session)
+            role = roleRepository.get_by_name(data.name)
+            if role:
+                raise HTTPException(status_code=400, detail="Role already exists")
             role = Role(
                 id=data.id,
                 name=data.name,
