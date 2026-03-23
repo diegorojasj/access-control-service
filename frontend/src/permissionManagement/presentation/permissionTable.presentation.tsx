@@ -49,7 +49,7 @@ const PermissionTable = () => {
     const renderRow = (permission: PermissionType) => (
         <TableRow key={permission.name}>
             <TableCell>{permission.name}</TableCell>
-            <TableCell>{permission.description ?? "—"}</TableCell>
+            <TableCell><div className="max-w-[200px] whitespace-normal break-words">{permission.description ?? "—"}</div></TableCell>
             <TableCell className="flex gap-2">
                 <Button
                     className="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-white"
@@ -95,7 +95,7 @@ const PermissionTable = () => {
                 <TableHeader>
                     <TableRow>
                         <TableHead>Name</TableHead>
-                        <TableHead>Description</TableHead>
+                        <TableHead className="w-[200px]">Description</TableHead>
                         <TableHead>Actions</TableHead>
                     </TableRow>
                 </TableHeader>

@@ -133,7 +133,7 @@ const TodoListTable = () => {
                     <TableHeader>
                         <TableRow>
                             <TableHead>Task</TableHead>
-                            <TableHead>Description</TableHead>
+                            <TableHead className="w-[200px]">Description</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>User</TableHead>
                             <TableHead>Actions</TableHead>

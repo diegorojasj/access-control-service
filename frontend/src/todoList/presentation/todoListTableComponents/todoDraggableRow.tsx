@@ -36,7 +36,7 @@ const TodoDraggableRow = ({ task, onEdit, onStatusChange, onDelete }: DraggableR
             className="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors"
         >
             <TableCell>{task.task}</TableCell>
-            <TableCell>{task.description}</TableCell>
+            <TableCell><div className="max-w-[200px] whitespace-normal break-words">{task.description}</div></TableCell>
             <TableCell>{isPending ? "Pending" : "Completed"}</TableCell>
             <TableCell>{task.user?.name}</TableCell>
             <TableCell className="flex gap-2" onPointerDown={(e) => e.stopPropagation()}>
