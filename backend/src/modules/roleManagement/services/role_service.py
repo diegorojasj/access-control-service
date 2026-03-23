@@ -1,8 +1,9 @@
-from src.modules.roleManagement.infrastructure.types.role_types import update_requestType
+from src.modules.roleManagement.infrastructure.types.role_types import onlyId_requestType, update_requestType
 from src.modules.roleManagement.infrastructure.entities.role_entity import Role
 from src.modules.roleManagement.infrastructure.types.role_types import create_requestType
 from src.core.database import Session
 from src.modules.roleManagement.infrastructure.repositories.role_repository import RoleRepository
+from fastapi import HTTPException
 
 class RoleService:
     def list(self):
@@ -35,3 +36,14 @@ class RoleService:
             )
             roleRepository.update(role)
             return {"message": "Role updated successfully"}
+
+    async def delete(self, request):
+        json_data = await request.json()
+        data = onlyId_requestType(**json_data)
+        with Session() as session:
+            roleRepository = RoleRepository(session)
+            role = roleRepository.get_by_id(data.id)
+            if role is None:
+                raise HTTPException(status_code=404, detail="Role not found")
+            roleRepository.delete(role)
+            return {"message": "Role deleted successfully"}

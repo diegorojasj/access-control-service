@@ -6,7 +6,7 @@ from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy.orm import Mapped
 
 if TYPE_CHECKING:
-    from src.modules.permissions.infrastructure.entities.role_entity import Role
+    from src.modules.roleManagement.infrastructure.entities.role_entity import Role
 
 class Permission(Base):
     __tablename__ = "permission"

@@ -11,3 +11,7 @@ class update_requestType(baseType):
     id: int
     name: str
     description: str
+
+@dataclass
+class onlyId_requestType(baseType):
+    id: int

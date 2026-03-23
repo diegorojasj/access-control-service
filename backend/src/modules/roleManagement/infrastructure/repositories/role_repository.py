@@ -9,7 +9,7 @@ class RoleRepository:
         return [row._asdict() for row in rows]
 
     def get_by_id(self, id):
-        return self.session.query(Role.id, Role.name, Role.description).filter(Role.id == id).first()
+        return self.session.query(Role).filter(Role.id == id).first()
 
     def get_by_name(self, name):
         return self.session.query(Role).filter(Role.name == name).first()

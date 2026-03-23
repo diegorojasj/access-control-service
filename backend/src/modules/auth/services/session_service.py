@@ -1,3 +1,6 @@
+from src.core.context import set_current_user_id
+from src.modules.userManagement.infrastructure.repositories.user_repository import UserRepository
+from src.security.token import verify_token
 from src.shared.utils import getExpiredAt
 from src.shared.utils import generate_token_by_user
 from src.shared.utils import setCookie
@@ -28,3 +31,20 @@ class SessionService:
             setCookie("user", user.username, response, httponly=False)
             setCookie("role", user.role.name, response, httponly=False)
             return {"message": "Login successful"}
+
+    async def isLoggedIn(self, request: Request):
+        token = request.cookies.get("token")
+        if not token:
+            raise AuthException(status_code=401, detail="Not authenticated")
+
+        payload = verify_token(token)
+        if not payload:
+            raise AuthException(status_code=401, detail="Invalid or expired token")
+    
+        with Session() as session:
+            user = UserRepository(session).get_by_id(payload.get("sub"))
+            if user is None or user.status == 0:
+                raise AuthException(status_code=401, detail="User is suspended")
+            set_current_user_id(str(payload.get("sub")))
+    
+        return {"id": payload.get("sub"), "role": payload.get("role")}
