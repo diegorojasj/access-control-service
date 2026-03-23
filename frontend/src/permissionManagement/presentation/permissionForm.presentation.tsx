@@ -48,9 +48,10 @@ const PermissionForm = ({ permission, onSuccess }: { permission?: PermissionType
                     onSuccess?.()
                 },
                 onError: (error) => {
+                    const err = error as Error & { detail?: string }
                     sileo.error({
                         title: permission ? "Update failed" : "Create failed",
-                        description: (error as Error).message,
+                        description: err.message ?? err.detail,
                     })
                 },
             }

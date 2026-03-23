@@ -38,9 +38,10 @@ const TodoForm = ({ todo, onSuccess }: { todo?: TodoType; onSuccess?: () => void
                     onSuccess?.()
                 },
                 onError: (error) => {
+                    const err = error as Error & { detail?: string }
                     sileo.error({
                         title: todo ? "Update failed" : "Create failed",
-                        description: (error as Error).message,
+                        description: err.message ?? err.detail,
                     })
                 },
             }

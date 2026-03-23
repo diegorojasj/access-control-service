@@ -72,7 +72,8 @@ const TodoListTable = () => {
                             sileo.success({ title: "Status updated", description: "Task status has been changed." })
                         },
                         onError: (error) => {
-                            sileo.error({ title: "Status change failed", description: (error as Error).message })
+                            const err = error as Error & { detail?: string }
+                            sileo.error({ title: "Status change failed", description: err.message ?? err.detail })
                         }
                     })
                 }
@@ -95,7 +96,8 @@ const TodoListTable = () => {
                             sileo.success({ title: "Task deleted", description: "The task has been deleted." })
                         },
                         onError: (error) => {
-                            sileo.error({ title: "Delete failed", description: (error as Error).message })
+                            const err = error as Error & { detail?: string }
+                            sileo.error({ title: "Delete failed", description: err.message ?? err.detail })
                         }
                     })
                 }

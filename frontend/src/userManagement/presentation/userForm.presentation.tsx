@@ -74,9 +74,10 @@ const UserForm = ({ user, onSuccess }: { user?: UserType, onSuccess?: () => void
                 onSuccess?.()
             },
             onError: (error) => {
+                const err = error as Error & { detail?: string }
                 sileo.error({
                     title: user ? "User update failed" : "User creation failed",
-                    description: (error as Error).message,
+                    description: err.message ?? err.detail,
                 })
             }
         })

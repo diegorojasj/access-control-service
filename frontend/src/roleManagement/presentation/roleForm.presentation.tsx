@@ -38,9 +38,10 @@ const RoleForm = ({ role, onSuccess }: { role?: RoleType; onSuccess?: () => void
                     onSuccess?.()
                 },
                 onError: (error) => {
+                    const err = error as Error & { detail?: string }
                     sileo.error({
                         title: role ? "Update failed" : "Create failed",
-                        description: (error as Error).message,
+                        description: err.message ?? err.detail,
                     })
                 },
             }

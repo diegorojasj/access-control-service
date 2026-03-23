@@ -50,9 +50,10 @@ const LoginForm = () => {
                 navigate('/')
             },
             onError: (error) => {
+                const err = error as Error & { detail?: string }
                 sileo.error({
                     title: "Login failed",
-                    description: (error as Error).message,
+                    description: err.message ?? err.detail,
                 })
             }
         })

@@ -37,7 +37,8 @@ const RoleTable = () => {
                             sileo.success({ title: "Role deleted", description: "The role has been deleted." })
                         },
                         onError: (error) => {
-                            sileo.error({ title: "Delete failed", description: (error as Error).message })
+                            const err = error as Error & { detail?: string }
+                            sileo.error({ title: "Delete failed", description: err.message ?? err.detail })
                         },
                     })
                 },

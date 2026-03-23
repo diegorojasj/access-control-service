@@ -46,9 +46,10 @@ const UserTable = () => {
                             })
                         },
                         onError: (error) => {
+                            const err = error as Error & { detail?: string }
                             sileo.error({
                                 title: "User status change failed",
-                                description: (error as Error).message,
+                                description: err.message ?? err.detail,
                             })
                         }
                     })
