@@ -6,6 +6,13 @@ x-postgres-env: &postgres-env
   POSTGRES_PORT: ${POSTGRES_PORT:-5432}
 
 services:
+  init-dirs:
+    image: busybox
+    command: sh -c "mkdir -p /mnt/postgres/data && tail -f /dev/null"
+    volumes:
+      - .:/mnt
+    restart: "no"
+
   postgres:
     image: postgres:15
     container_name: postgres
@@ -18,27 +25,25 @@ services:
         source: ./postgres/data
         target: /var/lib/postgresql/data
         bind:
-          create_host_path: true
           selinux: z
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
+    depends_on:
+      - init-dirs
 
   init-db:
-    image: postgres:15
+    build:
+      context: .
+      dockerfile: containers/containerfiles/backend.containerfile
+    command: python seed.py
+    volumes:
+      - ./backend:/app:z
+      - ./postgres/default_data:/scripts:z
     environment:
       <<: *postgres-env
-      PGPASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - ./postgres/default_data:/scripts:Z
-    command: >
-      bash -c "
-        psql -h ${POSTGRES_HOST:-postgres} -p ${POSTGRES_PORT:-5432} -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f /scripts/roles.sql &&
-        psql -h ${POSTGRES_HOST:-postgres} -p ${POSTGRES_PORT:-5432} -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f /scripts/permissions.sql &&
-        psql -h ${POSTGRES_HOST:-postgres} -p ${POSTGRES_PORT:-5432} -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f /scripts/users.sql
-      "
     depends_on:
       postgres:
         condition: service_healthy
@@ -68,8 +73,8 @@ services:
       FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-*}
       LIMIT_MAX_REQUESTS: ${LIMIT_MAX_REQUESTS:-}
     depends_on:
-      init-db:
-        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
   web:
     build:
       context: .
