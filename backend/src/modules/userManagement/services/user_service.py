@@ -1,6 +1,6 @@
 from src.shared.utils import passwordVerify
 from fastapi import HTTPException
-from src.modules.userManagement.infrastructure.types.user_types import delete_requestType
+from src.modules.userManagement.infrastructure.types.user_types import onlyId_requestType
 from src.modules.userManagement.infrastructure.types.user_types import update_requestType
 from src.modules.userManagement.infrastructure.types.user_types import create_requestType
 from src.modules.auth.infrastructure.entities.user_entity import User
@@ -54,7 +54,7 @@ class UserService:
 
     async def status_change(self, request):
         json_data = await request.json()
-        data = delete_requestType(**json_data)
+        data = onlyId_requestType(**json_data)
         with Session() as session:
             userRepository = UserRepository(session)
             user = userRepository.get_by_id(data.id)
