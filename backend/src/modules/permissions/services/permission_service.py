@@ -20,7 +20,6 @@ class PermissionService:
             permission = Permission(
                 name=data.name,
                 description=data.description,
-                role_id=data.role_id
             )
             repo.create(permission)
             return {"message": "Permission created successfully"}
@@ -34,7 +33,6 @@ class PermissionService:
             if permission is None:
                 raise HTTPException(status_code=404, detail="Permission not found")
             permission.description = data.description
-            permission.role_id = data.role_id
             repo.update(permission)
             return {"message": "Permission updated successfully"}
 

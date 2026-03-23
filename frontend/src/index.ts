@@ -19,6 +19,7 @@ const server = serve({
     "/user/*": proxyToBackend,
     "/role/*": proxyToBackend,
     "/todo/*": proxyToBackend,
+    "/permission/*": proxyToBackend,
     "/*": index,
   },
 

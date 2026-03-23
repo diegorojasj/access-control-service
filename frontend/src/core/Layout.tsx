@@ -4,13 +4,19 @@ import { AppStore } from "./AppContext"
 import UserFormApplication from "@/userManagement/application/userForm.application";
 import TodoListTableApplication from "@/todoList/application/todoListTable.application";
 import TodoListFormApplication from "@/todoList/application/todoListForm.application";
+import RoleFormApplication from "@/roleManagement/application/roleForm.application";
+import PermissionFormApplication from "@/permissionManagement/application/permissionForm.application";
 
 const UserTableApplication = lazy(() => import("@/userManagement/application/userTable.application"))
+const RoleTableApplication = lazy(() => import("@/roleManagement/application/roleTable.application"))
+const PermissionTableApplication = lazy(() => import("@/permissionManagement/application/permissionTable.application"))
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     const {
         openUserManagementTable, openUserManagementForm,
         openToDoListTable, openToDoListForm,
+        openRoleManagementTable, openRoleManagementForm,
+        openPermissionManagementTable, openPermissionManagementForm,
         reset,
     } = AppStore()
 
@@ -34,10 +40,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 </Suspense>
             )}
             {
-                openUserManagementForm && (
-                    <Suspense fallback={null}>
-                        <UserFormApplication />
-                    </Suspense>
+            openUserManagementForm && (
+                <Suspense fallback={null}>
+                    <UserFormApplication />
+                </Suspense>
             )}
             {openToDoListTable && (
                 <Suspense fallback={null}>
@@ -47,6 +53,26 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             {openToDoListForm && (
                 <Suspense fallback={null}>
                     <TodoListFormApplication />
+                </Suspense>
+            )}
+            {openRoleManagementTable && (
+                <Suspense fallback={null}>
+                    <RoleTableApplication />
+                </Suspense>
+            )}
+            {openRoleManagementForm && (
+                <Suspense fallback={null}>
+                    <RoleFormApplication />
+                </Suspense>
+            )}
+            {openPermissionManagementTable && (
+                <Suspense fallback={null}>
+                    <PermissionTableApplication />
+                </Suspense>
+            )}
+            {openPermissionManagementForm && (
+                <Suspense fallback={null}>
+                    <PermissionFormApplication />
                 </Suspense>
             )}
         </div>

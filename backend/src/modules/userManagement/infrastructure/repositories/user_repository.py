@@ -11,6 +11,9 @@ class UserRepository:
     def get_by_username(self, username):
         return self.session.query(User.id, User.name, User.username, User._role.label("role")).filter(User.username == username).first()
 
+    def get_by_role(self, role):
+        return self.session.query(User.id, User._role.label("role")).filter(User._role == role).all()
+
     def create(self, user):
         self.session.add(user)
         self.session.commit()

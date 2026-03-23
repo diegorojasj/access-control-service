@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar"
 import { AppStore } from "@/core/AppContext"
 import { useNavigate } from "react-router-dom"
+import { ChevronDown } from "lucide-react"
 
 const MenuBar = () => {
     const {
@@ -10,6 +11,10 @@ const MenuBar = () => {
         setOpenUserManagementForm,
         setOpenToDoListTable,
         setOpenToDoListForm,
+        setOpenRoleManagementTable,
+        setOpenRoleManagementForm,
+        setOpenPermissionManagementTable,
+        setOpenPermissionManagementForm,
     } = AppStore()
     const navigate = useNavigate()
     const [open, setOpen] = useState(false)
@@ -24,8 +29,8 @@ const MenuBar = () => {
     const menuItems = [
         { label: "To Do List", children: [{ label: "New", onClick: () => setOpenToDoListForm(true) }, { label: "View", onClick: () => setOpenToDoListTable(true) }] },
         { label: "User Management", children: [{ label: "New", onClick: () => setOpenUserManagementForm(true) }, { label: "View", onClick: () => setOpenUserManagementTable(true) }] },
-        { label: "Role Management", children: [{ label: "New", onClick: undefined }, { label: "View", onClick: undefined }] },
-        { label: "Permission Management", children: [{ label: "New", onClick: undefined }, { label: "View", onClick: undefined }] },
+        { label: "Role Management", children: [{ label: "New", onClick: () => setOpenRoleManagementForm(true) }, { label: "View", onClick: () => setOpenRoleManagementTable(true) }] },
+        { label: "Permission Management", children: [{ label: "New", onClick: () => setOpenPermissionManagementForm(true) }, { label: "View", onClick: () => setOpenPermissionManagementTable(true) }] },
     ]
 
     return (
@@ -66,7 +71,7 @@ const MenuBar = () => {
                         aria-expanded={open}
                     >
                         <span className={`inline-block transition-all duration-200 ${open ? "rotate-90 opacity-80" : "rotate-0 opacity-100"}`}>
-                        {open ? "✕" : "☰"}
+                            {open ? "✕" : "☰"}
                         </span>
                     </button>
                 </div>
@@ -110,13 +115,13 @@ const MenuBar = () => {
                             </div>
                         )
                     })}
-                        <button
+                    <button
                         className="w-full text-left px-4 py-3 text-sm hover:bg-accent active:bg-accent transition-colors duration-150 text-destructive cursor-pointer"
-                            onClick={() => navigate("/logout")}
-                        >
-                            Logout
-                        </button>
-                    </div>
+                        onClick={() => navigate("/logout")}
+                    >
+                        Logout
+                    </button>
+                </div>
             </div>
         </>
     )

@@ -6,13 +6,11 @@ from typing import Optional
 class create_requestType(baseType):
     name: str
     description: Optional[str] = None
-    role_id: Optional[int] = None
 
 @dataclass
 class update_requestType(baseType):
     name: str
     description: Optional[str] = None
-    role_id: Optional[int] = None
 
 @dataclass
 class onlyName_requestType(baseType):

@@ -1,3 +1,4 @@
+from src.modules.userManagement.infrastructure.repositories.user_repository import UserRepository
 from src.modules.roleManagement.infrastructure.types.role_types import onlyId_requestType, update_requestType
 from src.modules.roleManagement.infrastructure.entities.role_entity import Role
 from src.modules.roleManagement.infrastructure.types.role_types import create_requestType
@@ -45,5 +46,9 @@ class RoleService:
             role = roleRepository.get_by_id(data.id)
             if role is None:
                 raise HTTPException(status_code=404, detail="Role not found")
+            userRepository = UserRepository(session)
+            users = userRepository.get_by_role(role.name)
+            if users:
+                raise HTTPException(status_code=400, detail="Role is assigned to users")
             roleRepository.delete(role)
             return {"message": "Role deleted successfully"}
