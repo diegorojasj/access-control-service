@@ -13,12 +13,12 @@ const UserTable = () => {
     const queryClient = useQueryClient()
     const request = useAutoRequest<UserType[]>({
         queryKey: ["users"],
-        url: "/user/list"
+        url: "/user"
     })
 
     const statusChangeRequest = useMutateRequest<UserType[]>({
-        url: "/user/status-change",
-        method: "POST"
+        url: "/user/status",
+        method: "PATCH"
     })
 
     const onEdit = (user: UserType) => {

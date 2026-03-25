@@ -19,13 +19,13 @@ const UserForm = ({ user, onSuccess }: { user?: UserType, onSuccess?: () => void
     const [passwordError, setPasswordError] = useState<string | null>(null)
 
     const request = useMutateRequest<UserType[]>({
-        url: user ? "/user/update" : "/user/create",
-        method: "POST"
+        url: "/user",
+        method: user ? "PUT" : "POST"
     })
 
     const roleRequest = useAutoRequest<RoleType[]>({
         queryKey: ["roles"],
-        url: "/role/list",
+        url: "/role",
         method: "GET"
     })
 

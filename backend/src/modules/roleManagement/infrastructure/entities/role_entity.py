@@ -1,16 +1,10 @@
 from sqlalchemy.orm import relationship
 from src.modules.permissions.infrastructure.entities.permission_entity import Permission
+from src.modules.roleManagement.infrastructure.entities.role_permission_entity import role_permissions
 from datetime import datetime, timezone
-from sqlalchemy import DateTime, String, Integer, Table, Column, ForeignKey
+from sqlalchemy import DateTime, String, Integer, Boolean
 from sqlalchemy.orm import mapped_column, Mapped
 from src.shared.baseModel import Base
-
-role_permissions = Table(
-    "role_permissions",
-    Base.metadata,
-    Column("role_id", Integer, ForeignKey("roles.id"), primary_key=True),
-    Column("permission_name", String(50), ForeignKey("permission.name"), primary_key=True),
-)
 
 class Role(Base):
     __tablename__ = "roles"
@@ -18,5 +12,6 @@ class Role(Base):
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=True)
     permissions: Mapped[list["Permission"]] = relationship("Permission", secondary=role_permissions)
+    is_immutable: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))

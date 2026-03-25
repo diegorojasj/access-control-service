@@ -15,13 +15,13 @@ const PermissionForm = ({ permission, onSuccess }: { permission?: PermissionType
     const queryClient = useQueryClient()
 
     const request = useMutateRequest({
-        url: permission ? "/permission/update" : "/permission/create",
-        method: "POST",
+        url: "/permission",
+        method: permission ? "PUT" : "POST",
     })
 
     const roleRequest = useAutoRequest<RoleType[]>({
         queryKey: ["roles"],
-        url: "/role/list",
+        url: "/role",
         method: "GET",
     })
 

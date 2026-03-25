@@ -36,11 +36,13 @@ class RoleService:
             role = roleRepository.get_by_name(data.name)
             if role:
                 raise HTTPException(status_code=400, detail="Role already exists")
-            role = Role(
-                id=data.id,
-                name=data.name,
-                description=data.description
-            )
+            role = roleRepository.get_by_id(data.id)
+            if role is None:
+                raise HTTPException(status_code=404, detail="Role not found")
+            if role.is_immutable:
+                raise HTTPException(status_code=400, detail="Role is immutable")
+            role.name = data.name
+            role.description = data.description
             roleRepository.update(role)
             return {"message": "Role updated successfully"}
 
@@ -52,6 +54,8 @@ class RoleService:
             role = roleRepository.get_by_id(data.id)
             if role is None:
                 raise HTTPException(status_code=404, detail="Role not found")
+            if role.is_immutable:
+                raise HTTPException(status_code=400, detail="Role is immutable")
             userRepository = UserRepository(session)
             users = userRepository.get_by_role(role.name)
             if users:

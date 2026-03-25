@@ -15,3 +15,8 @@ class update_requestType(baseType):
 @dataclass
 class onlyId_requestType(baseType):
     id: int
+
+@dataclass
+class permission_requestType(baseType):
+    role_id: int
+    permission_name: str

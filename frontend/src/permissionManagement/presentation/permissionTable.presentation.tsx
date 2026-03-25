@@ -14,12 +14,12 @@ const PermissionTable = () => {
 
     const request = useAutoRequest<PermissionType[]>({
         queryKey: ["permissions"],
-        url: "/permission/list",
+        url: "/permission",
     })
 
     const deleteRequest = useMutateRequest({
-        url: "/permission/delete",
-        method: "POST",
+        url: "/permission",
+        method: "DELETE",
     })
 
     const onDelete = (permission: PermissionType) => {

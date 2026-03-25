@@ -14,12 +14,12 @@ const RoleTable = () => {
 
     const request = useAutoRequest<RoleType[]>({
         queryKey: ["roles"],
-        url: "/role/list",
+        url: "/role",
     })
 
     const deleteRequest = useMutateRequest({
-        url: "/role/delete",
-        method: "POST",
+        url: "/role",
+        method: "DELETE",
     })
 
     const onDelete = (role: RoleType) => {
