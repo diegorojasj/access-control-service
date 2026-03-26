@@ -18,7 +18,7 @@ class UserService:
     async def create(self, request):
         json_data = await request.json()
         data = create_requestType(**json_data)
-        with Session() as session:
+        with Session.begin() as session:
             userRepository = UserRepository(session)
             user = userRepository.get_by_username(data.username)
             if user:
@@ -35,7 +35,7 @@ class UserService:
     async def update(self, request):
         json_data = await request.json()
         data = update_requestType(**json_data)
-        with Session() as session:
+        with Session.begin() as session:
             userRepository = UserRepository(session)
             userVerification = userRepository.get_by_username(data.username)
             if userVerification is not None and userVerification.id != data.id:
@@ -61,7 +61,7 @@ class UserService:
     async def status_change(self, request):
         json_data = await request.json()
         data = onlyId_requestType(**json_data)
-        with Session() as session:
+        with Session.begin() as session:
             userRepository = UserRepository(session)
             user = userRepository.get_by_id(data.id)
             user.status = 0 if user.status == 1 else 1

@@ -14,10 +14,21 @@ port = os.getenv("POSTGRES_PORT", "5432")
 DATABASE_URL = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db}"
 
 # Create the engine
-engine = create_engine(DATABASE_URL)
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=1800,
+    pool_size=10,
+    max_overflow=20,
+)
 
 # Create session factory
-Session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+Session = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    autocommit=False,
+    expire_on_commit=False,
+)
 
 # Dependency for FastAPI routes
 def get_db() -> Generator[SessionType, None, None]:

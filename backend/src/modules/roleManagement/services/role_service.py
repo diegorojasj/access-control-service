@@ -25,7 +25,7 @@ class RoleService:
     async def create(self, request):
         json_data = await request.json()
         data = create_requestType(**json_data)
-        with Session() as session:
+        with Session.begin() as session:
             roleRepository = RoleRepository(session)
             role = roleRepository.get_by_name(data.name)
             if role:
@@ -40,7 +40,7 @@ class RoleService:
     async def update(self, request):
         json_data = await request.json()
         data = update_requestType(**json_data)
-        with Session() as session:
+        with Session.begin() as session:
             roleRepository = RoleRepository(session)
             role = roleRepository.get_by_name(data.name)
             if role:
@@ -52,13 +52,14 @@ class RoleService:
                 raise HTTPException(status_code=400, detail="Role is immutable")
             role.name = data.name
             role.description = data.description
+            role.permissions = data.permissionList
             roleRepository.update(role)
             return {"message": "Role updated successfully"}
 
     async def delete(self, request):
         json_data = await request.json()
         data = onlyId_requestType(**json_data)
-        with Session() as session:
+        with Session.begin() as session:
             roleRepository = RoleRepository(session)
             role = roleRepository.get_by_id(data.id)
             if role is None:

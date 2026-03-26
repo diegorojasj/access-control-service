@@ -16,15 +16,12 @@ class RoleRepository:
 
     def create(self, role):
         self.session.add(role)
-        self.session.commit()
         return role
 
     def update(self, role):
-        self.session.merge(role)
-        self.session.commit()
+        self.session.add(role)
         return role
 
     def delete(self, role):
         self.session.delete(role)
-        self.session.commit()
         return role

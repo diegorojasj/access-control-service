@@ -16,12 +16,10 @@ class UserRepository:
 
     def create(self, user):
         self.session.add(user)
-        self.session.commit()
         return user
 
     def update(self, user):
-        self.session.merge(user)
-        self.session.commit()
+        self.session.add(user)
         return user
 
     def get_by_id(self, id):

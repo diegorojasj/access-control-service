@@ -37,15 +37,12 @@ class TodoRepository:
 
     def create(self, todo):
         self.session.add(todo)
-        self.session.commit()
         return todo
 
     def update(self, todo):
-        self.session.merge(todo)
-        self.session.commit()
+        self.session.add(todo)
         return todo
 
     def delete(self, todo):
         self.session.delete(todo)
-        self.session.commit()
         return todo

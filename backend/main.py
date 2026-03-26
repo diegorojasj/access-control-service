@@ -5,7 +5,7 @@ from src.modules.roleManagement.role_router import role_router
 from src.core.entities_registry import register_entities
 from src.core.handlers import register_exception_handlers
 from src.modules.permissions.permission_router import permission_router
-
+from src.security.authMiddleware import AuthMiddleware
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
@@ -19,6 +19,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 register_exception_handlers(app)
+app.add_middleware(AuthMiddleware)
 
 app.include_router(session_router)
 app.include_router(user_router)
