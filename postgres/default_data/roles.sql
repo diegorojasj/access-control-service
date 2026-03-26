@@ -1,8 +1,8 @@
-INSERT INTO public.roles (id, name, description, created_at, updated_at) 
+INSERT INTO public.roles (id, name, description, is_immutable, created_at, updated_at) 
 VALUES 
-(1, 'admin', 'Administrator', NOW(), NOW()),
-(2, 'common', 'Common User', NOW(), NOW()),
-(3, 'readonly', 'Readonly User', NOW(), NOW())
+(1, 'admin', 'Administrator', true, NOW(), NOW()),
+(2, 'common', 'Common User', false, NOW(), NOW()),
+(3, 'readonly', 'Readonly User', false, NOW(), NOW())
 ON CONFLICT (id) 
 DO NOTHING;
 
