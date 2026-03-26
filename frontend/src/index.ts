@@ -15,10 +15,15 @@ async function proxyToBackend(req: Request): Promise<Response> {
 const server = serve({
   port: Number(process.env.FRONTEND_PORT ?? 3000),
   routes: {
+    "/auth": proxyToBackend,
     "/auth/*": proxyToBackend,
+    "/user": proxyToBackend,
     "/user/*": proxyToBackend,
+    "/role": proxyToBackend,
     "/role/*": proxyToBackend,
+    "/todo": proxyToBackend,
     "/todo/*": proxyToBackend,
+    "/permission": proxyToBackend,
     "/permission/*": proxyToBackend,
     "/*": index,
   },
