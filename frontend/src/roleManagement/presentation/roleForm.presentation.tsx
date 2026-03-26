@@ -1,34 +1,37 @@
 import { useQueryClient } from "@tanstack/react-query"
 import { useMutateRequest, useAutoRequest } from "@/shared/useRequest"
 import type { RoleType } from "../infrastructure/roleType.infrastructure"
-import type { PermissionType } from "@/permissionManagement/infrastructure/permissionType.infrastructure"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { sileo } from "sileo"
 import { Spinner } from "@/components/ui/spinner"
 import { useLayoutEffect, useState } from "react"
+import { Textarea } from "@/components/ui/textarea"
+import PermissionAssign from "./permissionAssign.presentation"
+import { decodePermissions } from "@/shared/utils"
 
 const RoleForm = ({ role, onSuccess }: { role?: RoleType; onSuccess?: () => void }) => {
     const queryClient = useQueryClient()
     const [selectedPermission, setSelectedPermission] = useState("")
-    const [assignedPermissions, setAssignedPermissions] = useState<PermissionType[]>([])
+    const [assignedPermissions, setAssignedPermissions] = useState<string[]>([])
 
     const request = useMutateRequest({
         url: "/role",
         method: role ? "PUT" : "POST",
     })
 
-    const allPermissionsRequest = useAutoRequest<PermissionType[]>({
+    const allPermissionsRequest = useAutoRequest<string[]>({
         queryKey: ["all-permissions"],
         url: "/permission",
         method: "GET",
+        select: (data) => data.map((p) => decodePermissions(p)).filter((p) => p !== "")
     })
 
-    const permissionsAssignedRequest = useAutoRequest<PermissionType[]>({
+    const permissionsAssignedRequest = useAutoRequest<string[]>({
         queryKey: ["role-permissions", role?.id],
         url: `/role/${role?.id}/permissions`,
         enabled: !!role,
+        select: (data) => data.map((p) => decodePermissions(p)).filter((p) => p !== "")
     })
 
     const onSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -66,21 +69,27 @@ const RoleForm = ({ role, onSuccess }: { role?: RoleType; onSuccess?: () => void
     }
 
     const onAssign = () => {
-        if (assignedPermissions.some((p) => p.name === selectedPermission)) {
+        if (assignedPermissions.some((p) => p === selectedPermission)) {
             sileo.warning({ title: "Permission already assigned" })
             return
         }
-        const permission = allPermissionsRequest.data?.find((p) => p.name === selectedPermission)
+        const permission = allPermissionsRequest.data?.find((p) => p === selectedPermission)
         if (!permission) return
         setAssignedPermissions((prev) => [...prev, permission])
     }
 
-    const onRemove = (permissionName: string) => {
-        setAssignedPermissions((prev) => prev.filter((p) => p.name !== permissionName))
+    const onCheck = (permissionName: string, action: "add" | "remove") => {
+        if (action === "add") {
+            const permission = allPermissionsRequest.data?.find((p) => p === permissionName)
+            if (!permission) return
+            setAssignedPermissions((prev) => [...prev, permission])
+        } else {
+            setAssignedPermissions((prev) => prev.filter((p) => p !== permissionName))
+        }
     }
 
     const unassignedPermissions = allPermissionsRequest.data?.filter(
-        (p) => !assignedPermissions.some((a) => a.name === p.name)
+        (p) => !assignedPermissions.some((a) => a === p)
     ) ?? []
 
     useLayoutEffect(() => {
@@ -100,7 +109,7 @@ const RoleForm = ({ role, onSuccess }: { role?: RoleType; onSuccess?: () => void
 
                     <div className="flex flex-col gap-1">
                         <label htmlFor="description" className="text-sm font-medium">Description</label>
-                        <Input id="description" name="description" type="text" placeholder="Description" defaultValue={role?.description} maxLength={255} />
+                        <Textarea id="description" name="description" placeholder="Description" defaultValue={role?.description} maxLength={255} />
                     </div>
 
                     {role && (
@@ -115,52 +124,22 @@ const RoleForm = ({ role, onSuccess }: { role?: RoleType; onSuccess?: () => void
                                 >
                                     <option value="">Select a permission...</option>
                                     {unassignedPermissions.map((p) => (
-                                        <option key={p.name} value={p.name}>{p.name}</option>
+                                        <option key={p} value={p}>{p}</option>
                                     ))}
                                 </select>
                                 <Button
                                     size="sm"
                                     onClick={onAssign}
-                                    disabled={!selectedPermission || permissionsAssignedRequest.isLoading}
+                                    type="button"
                                 >
-                                    {permissionsAssignedRequest.isLoading ? <Spinner /> : "Assign"}
+                                    Assign
                                 </Button>
                             </div>
-
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Permission</TableHead>
-                                        <TableHead className="w-[200px]">Description</TableHead>
-                                        <TableHead></TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {assignedPermissions.length === 0 && (
-                                        <TableRow>
-                                            <TableCell colSpan={3} className="text-center text-muted-foreground text-sm">
-                                                No permissions assigned
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                    {assignedPermissions.map((p) => (
-                                        <TableRow key={p.name}>
-                                            <TableCell className="text-sm">{p.name}</TableCell>
-                                            <TableCell className="text-sm text-muted-foreground"><div className="max-w-[200px] whitespace-normal break-words">{p.description ?? "—"}</div></TableCell>
-                                            <TableCell>
-                                                <Button
-                                                    size="sm"
-                                                    variant="secondary"
-                                                    className="bg-transparent border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                                                    onClick={() => onRemove(p.name)}
-                                                >
-                                                    Remove
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                            <PermissionAssign 
+                                allPermissionsRequest={allPermissionsRequest}
+                                assignedPermissions={assignedPermissions} 
+                                onCheck={onCheck} 
+                            />
                         </div>
                     )}
 

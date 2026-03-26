@@ -1,3 +1,4 @@
+from src.core.permissionsControl import PermissionControl
 from src.modules.userManagement.infrastructure.repositories.user_repository import UserRepository
 from src.modules.roleManagement.infrastructure.types.role_types import onlyId_requestType, update_requestType
 from src.modules.roleManagement.infrastructure.entities.role_entity import Role
@@ -12,6 +13,14 @@ class RoleService:
             roleRepository = RoleRepository(session)
             roleList = roleRepository.get_all()
             return roleList
+
+    def list_permissions(self, role_id: int):
+        with Session() as session:
+            role = RoleRepository(session).get_by_id(role_id)
+            if role is None:
+                raise HTTPException(status_code=404, detail="Role not found")
+            permissionControl = PermissionControl()
+            return [permissionControl.encodePermission(permission) for permission in role.permissions]
 
     async def create(self, request):
         json_data = await request.json()

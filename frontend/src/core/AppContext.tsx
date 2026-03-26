@@ -20,11 +20,6 @@ export const AppStore = create<AppContextType>((set) => ({
     setOpenRoleManagementForm: (bool) => set({ openRoleManagementForm: bool }),
     openRoleManagementTable: false,
     setOpenRoleManagementTable: (bool) => set({ openRoleManagementTable: bool }),
-    // Permission Management
-    openPermissionManagementForm: false,
-    setOpenPermissionManagementForm: (bool) => set({ openPermissionManagementForm: bool }),
-    openPermissionManagementTable: false,
-    setOpenPermissionManagementTable: (bool) => set({ openPermissionManagementTable: bool }),
     reset: () => set({
         user: null,
         openToDoListForm: false,
@@ -32,9 +27,7 @@ export const AppStore = create<AppContextType>((set) => ({
         openUserManagementForm: false,
         openUserManagementTable: false,
         openRoleManagementForm: false,
-        openRoleManagementTable: false,
-        openPermissionManagementForm: false,
-        openPermissionManagementTable: false
+        openRoleManagementTable: false
     })
 }))
 

@@ -13,8 +13,6 @@ const MenuBar = () => {
         setOpenToDoListForm,
         setOpenRoleManagementTable,
         setOpenRoleManagementForm,
-        setOpenPermissionManagementTable,
-        setOpenPermissionManagementForm,
     } = AppStore()
     const navigate = useNavigate()
     const [open, setOpen] = useState(false)
@@ -30,7 +28,6 @@ const MenuBar = () => {
         { label: "To Do List", children: [{ label: "New", onClick: () => setOpenToDoListForm(true) }, { label: "View", onClick: () => setOpenToDoListTable(true) }] },
         { label: "User Management", children: [{ label: "New", onClick: () => setOpenUserManagementForm(true) }, { label: "View", onClick: () => setOpenUserManagementTable(true) }] },
         { label: "Role Management", children: [{ label: "New", onClick: () => setOpenRoleManagementForm(true) }, { label: "View", onClick: () => setOpenRoleManagementTable(true) }] },
-        { label: "Permission Management", children: [{ label: "New", onClick: () => setOpenPermissionManagementForm(true) }, { label: "View", onClick: () => setOpenPermissionManagementTable(true) }] },
     ]
 
     return (

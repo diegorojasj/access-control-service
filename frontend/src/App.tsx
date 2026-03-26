@@ -5,6 +5,7 @@ import router from './router';
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import "./index.css";
 import AppContext from "./core/AppContext";
+import { TooltipProvider } from "./components/ui/tooltip";
 
 const elem = document.getElementById("root")!;
 const queryClient = new QueryClient({
@@ -23,7 +24,9 @@ const app = (
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AppContext>
-        <RouterProvider router={router} />
+        <TooltipProvider>
+          <RouterProvider router={router} />
+        </TooltipProvider>
       </AppContext>
     </QueryClientProvider>
   </StrictMode>

@@ -18,11 +18,6 @@ export interface AppContextType {
     setOpenRoleManagementForm: (bool: boolean) => void
     openRoleManagementTable: boolean
     setOpenRoleManagementTable: (bool: boolean) => void
-    // Permission Management
-    openPermissionManagementForm: boolean
-    setOpenPermissionManagementForm: (bool: boolean) => void
-    openPermissionManagementTable: boolean
-    setOpenPermissionManagementTable: (bool: boolean) => void
     // Reset
     reset: () => void
 }

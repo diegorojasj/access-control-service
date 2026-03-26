@@ -107,3 +107,30 @@ export function getCookie(name: string): string | null {
     return value
   }
 }
+
+export const decodePermissions = (permission: string) => {
+
+  try {
+    const binaryStrings = permission.split(' ')
+    const isValidBinary = binaryStrings.every((bin: string) => /^[01]{8}$/.test(bin))
+    if (!isValidBinary) {
+      return ''
+    }
+    if (binaryStrings.length > 200) {
+      return ''
+    }
+    const bytes = new Uint8Array(binaryStrings.map((binary) => Number.parseInt(binary, 2)))
+    const decoder = new TextDecoder('utf-8', { fatal: true })
+    const decoded = decoder.decode(bytes)
+    if (!/^[A-Z]:[A-Z]+$/.test(decoded)) {
+      return ''
+    }
+    if (decoded.length > 100) {
+      return ''
+    }
+    return decoded
+  } catch (error) {
+    return ''
+  }
+}
+    

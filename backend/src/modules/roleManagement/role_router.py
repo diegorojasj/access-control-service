@@ -1,6 +1,3 @@
-from src.modules.roleManagement.services.role_permission_service import RolePermissionService
-from fastapi import Depends
-from src.modules.auth.services.session_service import SessionService
 from src.modules.roleManagement.services.role_service import RoleService
 from fastapi import APIRouter, Request
 
@@ -28,15 +25,5 @@ async def role_delete(request: Request):
 
 @role_router.get("/{role_id}/permissions", tags=["role_permissions_list"], dependencies=[Depends(SessionService().isLoggedIn)])
 async def role_permissions_list(role_id: int):
-    service = RolePermissionService()
-    return service.list(role_id)
-
-@role_router.post("/permissions", tags=["role_permissions_assign"], dependencies=[Depends(SessionService().isLoggedIn)])
-async def role_permissions_assign(request: Request):
-    service = RolePermissionService()
-    return await service.assign(request)
-
-@role_router.delete("/permissions", tags=["role_permissions_remove"], dependencies=[Depends(SessionService().isLoggedIn)])
-async def role_permissions_remove(request: Request):
-    service = RolePermissionService()
-    return await service.remove(request)
+    service = RoleService()
+    return service.list_permissions(role_id)

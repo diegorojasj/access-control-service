@@ -1,22 +1,19 @@
 import { lazy, Suspense, useEffect } from "react"
 import MenuBar from "@/shared/MenuBar"
 import { AppStore } from "./AppContext"
-import UserFormApplication from "@/userManagement/application/userForm.application";
-import TodoListTableApplication from "@/todoList/application/todoListTable.application";
-import TodoListFormApplication from "@/todoList/application/todoListForm.application";
-import RoleFormApplication from "@/roleManagement/application/roleForm.application";
-import PermissionFormApplication from "@/permissionManagement/application/permissionForm.application";
 
+const UserFormApplication = lazy(() => import("@/userManagement/application/userForm.application"))
 const UserTableApplication = lazy(() => import("@/userManagement/application/userTable.application"))
 const RoleTableApplication = lazy(() => import("@/roleManagement/application/roleTable.application"))
-const PermissionTableApplication = lazy(() => import("@/permissionManagement/application/permissionTable.application"))
+const TodoListFormApplication = lazy(() => import("@/todoList/application/todoListForm.application"))
+const TodoListTableApplication = lazy(() => import("@/todoList/application/todoListTable.application"))
+const RoleFormApplication = lazy(() => import("@/roleManagement/application/roleForm.application"))
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     const {
         openUserManagementTable, openUserManagementForm,
         openToDoListTable, openToDoListForm,
         openRoleManagementTable, openRoleManagementForm,
-        openPermissionManagementTable, openPermissionManagementForm,
         reset,
     } = AppStore()
 
@@ -63,16 +60,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             {openRoleManagementForm && (
                 <Suspense fallback={null}>
                     <RoleFormApplication />
-                </Suspense>
-            )}
-            {openPermissionManagementTable && (
-                <Suspense fallback={null}>
-                    <PermissionTableApplication />
-                </Suspense>
-            )}
-            {openPermissionManagementForm && (
-                <Suspense fallback={null}>
-                    <PermissionFormApplication />
                 </Suspense>
             )}
         </div>

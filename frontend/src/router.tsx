@@ -5,13 +5,7 @@ import AuthRoute from './auth/auth.route'
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <AuthorizedComponent />,
-        children: [
-            // {
-            //     path: "/",
-            //     element: <Login />,
-            // },
-        ],
+        element: <AuthorizedComponent />
     },
     ...AuthRoute(),
 ])
