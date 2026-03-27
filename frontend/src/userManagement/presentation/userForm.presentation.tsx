@@ -4,7 +4,7 @@ import { useAutoRequest, useMutateRequest } from "@/shared/useRequest"
 import type { UserType } from "../infrastructure/userType.infrastructure"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { encode } from "@/shared/utils"
+import { hashPassword } from "@/shared/utils"
 import { sileo } from "sileo"
 import { Spinner } from "@/components/ui/spinner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -60,8 +60,8 @@ const UserForm = ({ user, onSuccess }: { user?: UserType, onSuccess?: () => void
             id: user?.id,
             name: form.name.value,
             username: form.username.value,
-            password: password && password !== "" ? encode(password) : undefined,
-            current_password: current_password && current_password !== "" ? encode(current_password) : undefined,
+            password: password && password !== "" ? await hashPassword(password) : undefined,
+            current_password: current_password && current_password !== "" ? await hashPassword(current_password) : undefined,
             role,
         }, {
             onSuccess: () => {

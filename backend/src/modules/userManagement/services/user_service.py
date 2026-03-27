@@ -1,3 +1,4 @@
+from src.core.permissionsControl import PermissionControl
 from src.shared.utils import passwordVerify
 from fastapi import HTTPException
 from src.modules.userManagement.infrastructure.types.user_types import onlyId_requestType
@@ -64,6 +65,15 @@ class UserService:
         with Session.begin() as session:
             userRepository = UserRepository(session)
             user = userRepository.get_by_id(data.id)
-            user.status = 0 if user.status == 1 else 1
+            if user is None:
+                raise HTTPException(status_code=404, detail="User not found")
+            # Check permissions
+            permissionControl = PermissionControl()
+            if user.status == 0:
+                permissionControl.checkPermission("user:unsuspend", ignoreUserSuspended=True, user=user)
+                user.status = 1
+            else:
+                permissionControl.checkPermission("user:suspend", user=user)
+                user.status = 0
             userRepository.update(user)
             return {"message": "User status changed successfully"}

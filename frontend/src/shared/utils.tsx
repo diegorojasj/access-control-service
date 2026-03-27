@@ -1,9 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { useNavigate } from "react-router-dom";
-import { AppStore } from "@/core/AppContext";
-import { useMutateRequest } from "./useRequest";
-
 const ALGO = "AES-GCM" as const;
 const SALT_BYTES = 16;
 const IV_BYTES = 12;
@@ -108,29 +104,24 @@ export function getCookie(name: string): string | null {
   }
 }
 
-export const decodePermissions = (permission: string) => {
+export async function hashPassword(password: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(password))
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("")
+}
 
+export async function decodePermissions(encoded: string): Promise<string> {
   try {
-    const binaryStrings = permission.split(' ')
-    const isValidBinary = binaryStrings.every((bin: string) => /^[01]{8}$/.test(bin))
-    if (!isValidBinary) {
-      return ''
-    }
-    if (binaryStrings.length > 200) {
-      return ''
-    }
-    const bytes = new Uint8Array(binaryStrings.map((binary) => Number.parseInt(binary, 2)))
-    const decoder = new TextDecoder('utf-8', { fatal: true })
-    const decoded = decoder.decode(bytes)
-    if (!/^[A-Z]:[A-Z]+$/.test(decoded)) {
-      return ''
-    }
-    if (decoded.length > 100) {
-      return ''
-    }
-    return decoded
-  } catch (error) {
-    return ''
+    const username = getCookie("user")
+    if (!username) return ""
+    const result = await decrypt(encoded, username)
+    if (!result.success) return ""
+    if (!/^[a-z]+:[a-z]+$/.test(result.data)) return ""
+    if (result.data.length > 100) return ""
+    return result.data
+  } catch {
+    return ""
   }
 }
     

@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { AppStore } from "@/core/AppContext"
 import { useMutateRequest } from "@/shared/useRequest"
-import { encode, getCookie } from "@/shared/utils"
+import { hashPassword, getCookie } from "@/shared/utils"
 import { useNavigate } from "react-router-dom"
 import { sileo } from "sileo"
 
@@ -31,11 +31,11 @@ const LoginForm = () => {
             password: HTMLInputElement
         }
 
-        const encodePassword = encode(password.value)
+        const hashedPassword = await hashPassword(password.value)
 
         request.mutate({
             username: username.value,
-            password: encodePassword
+            password: hashedPassword
         }, {
             onSuccess: () => {
                 const name = getCookie("user")

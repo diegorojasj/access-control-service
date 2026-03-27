@@ -1,7 +1,7 @@
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from src.core.context import set_current_user_id
+from src.core.context import set_current_user_id, set_current_username
 from src.modules.userManagement.infrastructure.repositories.user_repository import UserRepository
 from src.security.token import verify_token
 from src.core.database import Session
@@ -22,12 +22,17 @@ class AuthMiddleware(BaseHTTPMiddleware):
         if not payload:
             return self._unauthorized("Invalid or expired token")
 
+        user_id = payload.get("sub")
+        if user_id is None:
+            return self._unauthorized("Invalid token payload")
+
         with Session() as session:
-            user = UserRepository(session).get_by_id(payload.get("sub"))
+            user = UserRepository(session).get_by_id(int(user_id))
             if user is None or user.status == 0:
                 return self._unauthorized("User is suspended")
 
         set_current_user_id(str(payload.get("sub")))
+        set_current_username(str(payload.get("username", "")))
         return await call_next(request)
 
     def _unauthorized(self, detail: str) -> JSONResponse:
