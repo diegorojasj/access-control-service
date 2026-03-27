@@ -23,6 +23,7 @@ const RoleTable = () => {
     })
 
     const onDelete = (role: RoleType) => {
+        if(role.is_immutable) return
         sileo.action({
             title: "Delete role?",
             description: `"${role.name}" will be permanently deleted.`,
@@ -51,22 +52,22 @@ const RoleTable = () => {
             <TableCell>{role.name}</TableCell>
             <TableCell><div className="max-w-[200px] whitespace-normal break-words">{role.description}</div></TableCell>
             <TableCell className="flex gap-2">
-                <Button
+                {!role.is_immutable && <Button
                     className="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-white"
                     size="sm"
                     variant="secondary"
                     onClick={() => setEditRole(role)}
                 >
                     Edit
-                </Button>
-                <Button
+                </Button>}
+                {!role.is_immutable && <Button
                     className="bg-transparent border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
                     size="sm"
                     variant="secondary"
                     onClick={() => onDelete(role)}
                 >
                     Delete
-                </Button>
+                </Button>}
             </TableCell>
         </TableRow>
     )

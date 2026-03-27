@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { sileo } from "sileo"
 import { Spinner } from "@/components/ui/spinner"
+import { Textarea } from "@/components/ui/textarea"
 
 const TodoForm = ({ todo, onSuccess }: { todo?: TodoType; onSuccess?: () => void }) => {
     const queryClient = useQueryClient()
@@ -59,7 +60,7 @@ const TodoForm = ({ todo, onSuccess }: { todo?: TodoType; onSuccess?: () => void
 
                     <div className="flex flex-col gap-1">
                         <label htmlFor="description" className="text-sm font-medium">Description</label>
-                        <Input id="description" name="description" type="text" placeholder="Description" defaultValue={todo?.description} required maxLength={255} />
+                        <Textarea id="description" name="description" placeholder="Description" defaultValue={todo?.description} maxLength={255} required />
                     </div>
 
                     <Button type="submit" form="todo-form" className="w-full" disabled={request.isPending}>

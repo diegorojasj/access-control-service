@@ -34,19 +34,23 @@ async function request<T>(config: RequestConfig): Promise<T> {
 }
 
 // Auto request (query) — fires automatically
-type UseAutoRequestOptions<T> = {
+type UseAutoRequestOptions<T, R = T> = {
     queryKey: unknown[]
     url: string
     method?: string
     headers?: Record<string, string>
-} & Omit<UseQueryOptions<T>, "queryKey" | "queryFn">
+    transform?: (data: T) => Promise<R> | R
+} & Omit<UseQueryOptions<R>, "queryKey" | "queryFn">
 
-export function useAutoRequest<T = unknown>(options: UseAutoRequestOptions<T>) {
-    const { queryKey, url, method, headers, ...queryOptions } = options
+export function useAutoRequest<T = unknown, R = T>(options: UseAutoRequestOptions<T, R>) {
+    const { queryKey, url, method, headers, transform, ...queryOptions } = options
 
-    return useQuery<T>({
+    return useQuery<R>({
         queryKey,
-        queryFn: () => request<T>({ url, method, headers }),
+        queryFn: async () => {
+            const data = await request<T>({ url, method, headers })
+            return transform ? await transform(data) : data as unknown as R
+        },
         refetchInterval: 25_000,
         refetchIntervalInBackground: false,
         ...queryOptions,

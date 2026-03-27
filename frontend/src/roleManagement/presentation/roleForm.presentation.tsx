@@ -20,21 +20,28 @@ const RoleForm = ({ role, onSuccess }: { role?: RoleType; onSuccess?: () => void
         method: role ? "PUT" : "POST",
     })
 
-    const allPermissionsRequest = useAutoRequest<string[]>({
+    const allPermissionsRequest = useAutoRequest<string[], string[]>({
         queryKey: ["all-permissions"],
         url: "/permission",
         method: "GET",
-        select: (data) => data.map((p) => decodePermissions(p)).filter((p) => p !== "")
+        transform: async (data) => {
+            const decoded = await Promise.all(data.map((p) => decodePermissions(p)))
+            return decoded.filter((p) => p !== "")
+        },
     })
 
-    const permissionsAssignedRequest = useAutoRequest<string[]>({
+    const permissionsAssignedRequest = useAutoRequest<string[], string[]>({
         queryKey: ["role-permissions", role?.id],
         url: `/role/${role?.id}/permissions`,
         enabled: !!role,
-        select: (data) => data.map((p) => decodePermissions(p)).filter((p) => p !== "")
+        transform: async (data) => {
+            const decoded = await Promise.all(data.map((p) => decodePermissions(p)))
+            return decoded.filter((p) => p !== "")
+        },
     })
 
     const onSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+        if (role && role.is_immutable) return
         e.preventDefault()
         const form = e.currentTarget as typeof e.currentTarget & {
             name: HTMLInputElement
@@ -46,6 +53,7 @@ const RoleForm = ({ role, onSuccess }: { role?: RoleType; onSuccess?: () => void
                 id: role?.id,
                 name: form.name.value,
                 description: form.description.value,
+                ...(role ? { permissionList: assignedPermissions } : {}),
             },
             {
                 onSuccess: () => {
