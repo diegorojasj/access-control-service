@@ -8,7 +8,7 @@ class RoleRepository:
         self.session = session
 
     def get_all(self) -> list[dict[str, Any]]:
-        rows = self.session.query(Role.id, Role.name, Role.description, Role.is_immutable).all()
+        rows = self.session.query(Role.id, Role.name, Role.description, Role.is_immutable).order_by(Role.id).all()
         return [row._asdict() for row in rows]
 
     def get_by_id(self, id: int) -> Role | None:

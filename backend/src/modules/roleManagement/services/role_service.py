@@ -1,3 +1,6 @@
+import asyncio
+import json
+from typing import AsyncGenerator
 from src.core.permissionsControl import PermissionControl
 from src.modules.userManagement.infrastructure.repositories.user_repository import UserRepository
 from src.modules.roleManagement.infrastructure.types.role_types import onlyId_requestType, update_requestType
@@ -5,7 +8,7 @@ from src.modules.roleManagement.infrastructure.entities.role_entity import Role
 from src.modules.roleManagement.infrastructure.types.role_types import create_requestType
 from src.core.database import Session
 from src.modules.roleManagement.infrastructure.repositories.role_repository import RoleRepository
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 
 class RoleService:
     def list(self):
@@ -21,6 +24,25 @@ class RoleService:
                 raise HTTPException(status_code=404, detail="Role not found")
             permissionControl = PermissionControl()
             return [permissionControl.encodePermission(permission) for permission in role.permissions]
+
+    async def stream_permissions(self, role_id: int, request: Request) -> AsyncGenerator[str, None]:
+        last_permissions: list[str] | None = None
+        permissionControl = PermissionControl()
+
+        while not await request.is_disconnected():
+            with Session() as session:
+                role = RoleRepository(session).get_by_id(role_id)
+                if role is None:
+                    yield "event: error\ndata: Role not found\n\n"
+                    return
+                permissions: list[str] = list(role.permissions or [])
+
+            if permissions != last_permissions:
+                last_permissions = permissions
+                encoded = [permissionControl.encodePermission(p) for p in permissions]
+                yield f"data: {json.dumps(encoded)}\n\n"
+
+            await asyncio.sleep(3)
 
     async def create(self, request):
         json_data = await request.json()

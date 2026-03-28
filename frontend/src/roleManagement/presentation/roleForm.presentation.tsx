@@ -58,6 +58,7 @@ const RoleForm = ({ role, onSuccess }: { role?: RoleType; onSuccess?: () => void
             {
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["roles"] })
+                    queryClient.invalidateQueries({ queryKey: ["role-permissions", role?.id] })
                     sileo.success({
                         title: role ? "Role updated" : "Role created",
                         description: role ? "The role has been updated." : "The role has been created.",

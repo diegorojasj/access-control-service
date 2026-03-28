@@ -3,6 +3,8 @@ import type { AuthType } from "@/auth/infrastructure/authType.infrastructure"
 export interface AppContextType {
     user: AuthType | null
     setUser: (user: AuthType | null) => void
+    permissions: string[]
+    setPermissions: (permissions: string[]) => void
     // To Do List
     openToDoListForm: boolean
     setOpenToDoListForm: (bool: boolean) => void
@@ -18,6 +20,5 @@ export interface AppContextType {
     setOpenRoleManagementForm: (bool: boolean) => void
     openRoleManagementTable: boolean
     setOpenRoleManagementTable: (bool: boolean) => void
-    // Reset
     reset: () => void
 }

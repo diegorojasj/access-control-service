@@ -1,6 +1,7 @@
 from src.modules.todoList.todo_router import permissionControl
 from src.modules.roleManagement.services.role_service import RoleService
 from fastapi import APIRouter, Request, Depends
+from fastapi.responses import StreamingResponse
 
 role_router = APIRouter(prefix="/role", tags=["roleManagement"])
 
@@ -28,3 +29,12 @@ async def role_delete(request: Request):
 async def role_permissions_list(role_id: int):
     service = RoleService()
     return service.list_permissions(role_id)
+
+@role_router.get("/{role_id}/permissions/stream", tags=["role_permissions_stream"], dependencies=[Depends(permissionControl.requirePermission("role:view"))])
+async def role_permissions_stream(role_id: int, request: Request):
+    service = RoleService()
+    return StreamingResponse(
+        service.stream_permissions(role_id, request),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
