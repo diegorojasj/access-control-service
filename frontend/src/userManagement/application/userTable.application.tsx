@@ -1,5 +1,5 @@
 import DraggableModal from "@/shared/DraggableModal"
-import UserTable from "../presentation/userTable.presentation"
+import UserTable from "@/userManagement/presentation/userTable.presentation"
 import { AppStore } from "@/core/AppContext"
 
 const UserTableApplication = () => {

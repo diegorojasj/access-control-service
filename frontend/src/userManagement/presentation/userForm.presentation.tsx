@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useAutoRequest, useMutateRequest } from "@/shared/useRequest"
-import type { UserType } from "../infrastructure/userType.infrastructure"
+import type { UserType } from "@/userManagement/infrastructure/userType.infrastructure"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { hashPassword } from "@/shared/utils"

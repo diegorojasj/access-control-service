@@ -1,12 +1,12 @@
 import { ArrowLeft } from "lucide-react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAutoRequest, useMutateRequest } from "@/shared/useRequest"
-import type { UserType } from "../infrastructure/userType.infrastructure"
+import type { UserType } from "@/userManagement/infrastructure/userType.infrastructure"
 import { Button } from "@/components/ui/button"
 import { sileo } from "sileo"
 import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
-import UserForm from "./userForm.presentation"
+import UserForm from "@/userManagement/presentation/userForm.presentation"
 
 const UserTable = () => {
     const [editUser, setEditUser] = useState<UserType | null>(null)

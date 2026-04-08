@@ -1,11 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom'
-import AuthorizedComponent from './core/AuthorizedComponent'
-import AuthRoute from './auth/auth.route'
+import AuthenticatedLayout from '@/core/AuthenticatedLayout'
+import AuthRoute from '@/auth/auth.route'
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <AuthorizedComponent />
+        element: <AuthenticatedLayout />
     },
     ...AuthRoute(),
 ])

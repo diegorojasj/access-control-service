@@ -1,5 +1,5 @@
 import DraggableModal from "@/shared/DraggableModal"
-import UserForm from "../presentation/userForm.presentation"
+import UserForm from "@/userManagement/presentation/userForm.presentation"
 import { AppStore } from "@/core/AppContext"
 
 const UserFormApplication = () => {

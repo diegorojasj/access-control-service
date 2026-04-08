@@ -1,6 +1,6 @@
 import { useLayoutEffect } from "react"
 import { useLocation } from "react-router-dom"
-import { AppStore } from "./AppContext"
+import { AppStore } from "@/core/AppContext"
 import { getCookie } from "@/shared/utils"
 
 function syncUserFromCookies() {

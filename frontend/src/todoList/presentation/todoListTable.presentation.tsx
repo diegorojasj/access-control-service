@@ -3,9 +3,9 @@ import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { useAutoRequest, useMutateRequest } from "@/shared/useRequest"
 import { useMemo, useState } from "react";
-import type { TodoType } from "../infrastructure/todoType.infrastructure";
-import TodoDraggableRow from "./todoListTableComponents/todoDraggableRow";
-import TodoListForm from "./todoListForm.presentation";
+import type { TodoType } from "@/todoList/infrastructure/todoType.infrastructure";
+import TodoDraggableRow from "@/todoList/presentation/todoListTableComponents/todoDraggableRow";
+import TodoListForm from "@/todoList/presentation/todoListForm.presentation";
 import { ArrowLeft } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { sileo } from "sileo";

@@ -1,5 +1,5 @@
 import { serve } from "bun";
-import index from "./index.html";
+import index from "@/index.html";
 
 const API_BASE_URL = process.env.BUN_PUBLIC_API_BASE_URL ?? "http://localhost:8000"
 

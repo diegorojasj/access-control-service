@@ -1,11 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from 'react-router-dom';
-import router from './router';
+import router from '@/router';
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import "./index.css";
-import AppContext from "./core/AppContext";
-import { TooltipProvider } from "./components/ui/tooltip";
+import '@/index.css';
+import AppContext from '@/core/AppContext';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const elem = document.getElementById("root")!;
 const queryClient = new QueryClient({

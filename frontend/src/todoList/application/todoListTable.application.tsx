@@ -1,6 +1,6 @@
 import { AppStore } from "@/core/AppContext"
 import DraggableModal from "@/shared/DraggableModal"
-import TodoListTable from "../presentation/todoListTable.presentation"
+import TodoListTable from "@/todoList/presentation/todoListTable.presentation"
 
 const TodoListTableApplication = () => {
     const { openToDoListTable: open, setOpenToDoListTable } = AppStore()

@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query"
 import { useMutateRequest } from "@/shared/useRequest"
-import type { TodoType } from "../infrastructure/todoType.infrastructure"
+import type { TodoType } from "@/todoList/infrastructure/todoType.infrastructure"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { sileo } from "sileo"

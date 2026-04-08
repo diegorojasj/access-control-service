@@ -1,5 +1,5 @@
 import DraggableModal from "@/shared/DraggableModal"
-import RoleTable from "../presentation/roleTable.presentation"
+import RoleTable from "@/roleManagement/presentation/roleTable.presentation"
 import { AppStore } from "@/core/AppContext"
 
 const RoleTableApplication = () => {

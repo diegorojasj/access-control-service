@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from "react"
 import MenuBar from "@/shared/MenuBar"
-import { AppStore } from "./AppContext"
+import { AppStore } from "@/core/AppContext"
 
 const UserFormApplication = lazy(() => import("@/userManagement/application/userForm.application"))
 const UserTableApplication = lazy(() => import("@/userManagement/application/userTable.application"))

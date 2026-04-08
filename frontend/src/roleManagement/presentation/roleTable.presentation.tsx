@@ -1,12 +1,12 @@
 import { ArrowLeft } from "lucide-react"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAutoRequest, useMutateRequest } from "@/shared/useRequest"
-import type { RoleType } from "../infrastructure/roleType.infrastructure"
+import type { RoleType } from "@/roleManagement/infrastructure/roleType.infrastructure"
 import { Button } from "@/components/ui/button"
 import { sileo } from "sileo"
 import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
-import RoleForm from "./roleForm.presentation"
+import RoleForm from "@/roleManagement/presentation/roleForm.presentation"
 
 const RoleTable = () => {
     const [editRole, setEditRole] = useState<RoleType | null>(null)

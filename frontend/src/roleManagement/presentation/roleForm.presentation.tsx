@@ -1,13 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query"
 import { useMutateRequest, useAutoRequest } from "@/shared/useRequest"
-import type { RoleType } from "../infrastructure/roleType.infrastructure"
+import type { RoleType } from "@/roleManagement/infrastructure/roleType.infrastructure"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { sileo } from "sileo"
 import { Spinner } from "@/components/ui/spinner"
 import { useLayoutEffect, useState } from "react"
 import { Textarea } from "@/components/ui/textarea"
-import PermissionAssign from "./permissionAssign.presentation"
+import PermissionAssign from "@/roleManagement/presentation/permissionAssign.presentation"
 import { decodePermissions } from "@/shared/utils"
 
 const RoleForm = ({ role, onSuccess }: { role?: RoleType; onSuccess?: () => void }) => {

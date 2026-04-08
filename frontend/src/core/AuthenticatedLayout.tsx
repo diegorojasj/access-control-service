@@ -1,9 +1,9 @@
 import Layout from "@/core/Layout"
 import RootLayout from "@/core/RootLayout"
 import { Navigate, Outlet } from "react-router-dom"
-import { AppStore } from "./AppContext"
+import { AppStore } from "@/core/AppContext"
 
-const AuthorizedComponent = () => {
+const AuthenticatedLayout = () => {
     const { user } = AppStore()
 
     return (
@@ -16,4 +16,4 @@ const AuthorizedComponent = () => {
     )
 }
 
-export default AuthorizedComponent
+export default AuthenticatedLayout

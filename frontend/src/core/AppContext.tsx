@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { sileo, Toaster } from "sileo"
 import { create } from "zustand"
-import type { AppContextType } from "./infrastructure/appContext.infrastructure"
+import type { AppContextType } from "@/core/infrastructure/appContext.infrastructure"
 import { decodePermissions } from "@/shared/utils"
 
 export const AppStore = create<AppContextType>((set) => ({

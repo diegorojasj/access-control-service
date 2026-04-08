@@ -1,5 +1,5 @@
 import { TableCell, TableRow } from "@/components/ui/table"
-import type { TodoType } from "../../infrastructure/todoType.infrastructure"
+import type { TodoType } from "@/todoList/infrastructure/todoType.infrastructure"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";

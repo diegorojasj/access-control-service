@@ -1,5 +1,5 @@
-import Login from "./application/login.application";
-import Logout from "./application/logout.application";
+import Login from "@/auth/application/login.application";
+import Logout from "@/auth/application/logout.application";
 
 const AuthRoute = () => {
     return [

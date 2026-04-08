@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import type { UseQueryResult } from "@tanstack/react-query"
-import CustomPermissionsCell from "./permissionAssign/customPermissionsCell"
+import CustomPermissionsCell from "@/roleManagement/presentation/permissionAssign/customPermissionsCell"
 import { Checkbox } from "@/components/ui/checkbox"
 
 const STANDARD_ACTIONS = ["all", "view", "create", "update", "delete"] as const
