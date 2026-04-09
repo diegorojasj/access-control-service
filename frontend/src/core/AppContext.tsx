@@ -4,11 +4,28 @@ import { create } from "zustand"
 import type { AppContextType } from "@/core/infrastructure/appContext.infrastructure"
 import { decodePermissions } from "@/shared/utils"
 
-export const AppStore = create<AppContextType>((set) => ({
+const PERMISSION_REGEX = /^[a-z]+:[a-z]+$/
+const ALLINONE_PREFIX = 'allinone:'
+const ALLINONE_ALL = 'allinone:all'
+
+export const AppStore = create<AppContextType>((set, get) => ({
     user: null,
     setUser: (user) => set({ user }),
     permissions: [],
     setPermissions: (permissions) => set({ permissions }),
+    requirePermission: (permission) => {
+        const { user, permissions } = get()
+        if (!user) return false
+        if (permissions.includes(ALLINONE_ALL)) return true
+
+        const check = (p: string): boolean => {
+            if (!p || !PERMISSION_REGEX.test(p)) return false
+            if (permissions.includes(p)) return true
+            return permissions.includes(`${ALLINONE_PREFIX}${p.split(':')[1]}`)
+        }
+
+        return check(permission)
+    },
     // To Do List
     openToDoListForm: false,
     setOpenToDoListForm: (bool) => set({ openToDoListForm: bool }),

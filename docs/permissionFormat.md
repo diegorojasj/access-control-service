@@ -13,7 +13,7 @@ The permission is a string that represents a authorization in the project. It is
 
 ```
 user:create
-user:read
+user:view
 user:update
 user:delete
 ```

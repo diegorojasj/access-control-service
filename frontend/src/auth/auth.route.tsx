@@ -1,5 +1,7 @@
-import Login from "@/auth/application/login.application";
-import Logout from "@/auth/application/logout.application";
+import { lazy } from "react"
+
+const Login = lazy(() => import("@/auth/application/login.application"));
+const Logout = lazy(() => import("@/auth/application/logout.application"));
 
 const AuthRoute = () => {
     return [

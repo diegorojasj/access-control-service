@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from 'react-router-dom';
 import router from '@/router';
@@ -25,7 +25,9 @@ const app = (
     <QueryClientProvider client={queryClient}>
       <AppContext>
         <TooltipProvider>
-          <RouterProvider router={router} />
+          <Suspense>
+            <RouterProvider router={router} />
+          </Suspense>
         </TooltipProvider>
       </AppContext>
     </QueryClientProvider>

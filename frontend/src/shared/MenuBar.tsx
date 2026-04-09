@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar"
 import { AppStore } from "@/core/AppContext"
 import { useNavigate } from "react-router-dom"
@@ -7,6 +7,8 @@ import { ChevronDown } from "lucide-react"
 const MenuBar = () => {
     const {
         user,
+        permissions,
+        requirePermission,
         setOpenUserManagementTable,
         setOpenUserManagementForm,
         setOpenToDoListTable,
@@ -18,37 +20,49 @@ const MenuBar = () => {
     const [open, setOpen] = useState(false)
     const [expanded, setExpanded] = useState<string | null>(null)
 
-    const handleItemClick = (onClick: () => void) => {
+    const handleItemClick = useCallback((onClick: () => void) => {
         onClick()
         setOpen(false)
         setExpanded(null)
-    }
+    }, [])
 
-    const menuItems = [
-        { label: "To Do List", children: [{ label: "New", onClick: () => setOpenToDoListForm(true) }, { label: "View", onClick: () => setOpenToDoListTable(true) }] },
-        { label: "User Management", children: [{ label: "New", onClick: () => setOpenUserManagementForm(true) }, { label: "View", onClick: () => setOpenUserManagementTable(true) }] },
-        { label: "Role Management", children: [{ label: "New", onClick: () => setOpenRoleManagementForm(true) }, { label: "View", onClick: () => setOpenRoleManagementTable(true) }] },
-    ]
+    const handleLogout = useCallback(() => navigate("/logout"), [navigate])
+
+    // Static structure — Zustand setters are stable references, so this is created once
+    const menuConfig = useMemo(() => [
+        { label: "To Do List",       permission: "todo:view", children: [{ label: "New", onClick: () => setOpenToDoListForm(true) },       { label: "View", onClick: () => setOpenToDoListTable(true) }] },
+        { label: "User Management",  permission: "user:view", children: [{ label: "New", onClick: () => setOpenUserManagementForm(true) },  { label: "View", onClick: () => setOpenUserManagementTable(true) }] },
+        { label: "Role Management",  permission: "role:view", children: [{ label: "New", onClick: () => setOpenRoleManagementForm(true) },  { label: "View", onClick: () => setOpenRoleManagementTable(true) }] },
+    ], [setOpenToDoListForm, setOpenToDoListTable, setOpenUserManagementForm, setOpenUserManagementTable, setOpenRoleManagementForm, setOpenRoleManagementTable])
+
+    // Re-filters only when SSE pushes a new permissions array
+    const menuItems = useMemo(
+        () => menuConfig.filter(item => requirePermission(item.permission)),
+        [permissions, menuConfig]
+    )
+
+    // Re-renders only when the visible set of items changes
+    const MenuOptions = useMemo(() => menuItems.map(item => (
+        <MenubarMenu key={item.label}>
+            <MenubarTrigger>{item.label}</MenubarTrigger>
+            <MenubarContent>
+                {item.children.map((child) => (
+                    <MenubarItem key={child.label} onClick={child.onClick}>{child.label}</MenubarItem>
+                ))}
+            </MenubarContent>
+        </MenubarMenu>
+    )), [menuItems])
 
     return (
         <>
             {/* Desktop */}
             <div className="hidden md:block">
                 <Menubar>
-                    {menuItems.map((item) => (
-                        <MenubarMenu key={item.label}>
-                            <MenubarTrigger>{item.label}</MenubarTrigger>
-                            <MenubarContent>
-                                {item.children.map((child) => (
-                                    <MenubarItem key={child.label} onClick={child.onClick}>{child.label}</MenubarItem>
-                                ))}
-                            </MenubarContent>
-                        </MenubarMenu>
-                    ))}
+                    {MenuOptions}
                     <MenubarMenu>
                         <MenubarTrigger>{user?.name}({user?.roleName})</MenubarTrigger>
                         <MenubarContent>
-                            <MenubarItem onClick={() => navigate("/logout")}>Logout</MenubarItem>
+                            <MenubarItem onClick={handleLogout}>Logout</MenubarItem>
                         </MenubarContent>
                     </MenubarMenu>
                 </Menubar>
@@ -114,7 +128,7 @@ const MenuBar = () => {
                     })}
                     <button
                         className="w-full text-left px-4 py-3 text-sm hover:bg-accent active:bg-accent transition-colors duration-150 text-destructive cursor-pointer"
-                        onClick={() => navigate("/logout")}
+                        onClick={handleLogout}
                     >
                         Logout
                     </button>
