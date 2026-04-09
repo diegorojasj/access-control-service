@@ -12,6 +12,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { AppStore } from "@/core/AppContext"
 import { useMutateRequest } from "@/shared/useRequest"
 import { hashPassword, getCookie } from "@/shared/utils"
+import type { SyntheticEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import { sileo } from "sileo"
 
@@ -24,7 +25,7 @@ const LoginForm = () => {
     })
 
     // Functions
-    const onSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+    const onSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault()
         const { username, password } = e.currentTarget as typeof e.currentTarget & {
             username: HTMLInputElement
