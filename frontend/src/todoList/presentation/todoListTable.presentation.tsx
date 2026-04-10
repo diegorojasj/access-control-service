@@ -2,17 +2,24 @@ import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from
 import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { useAutoRequest, useMutateRequest } from "@/shared/useRequest"
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { TodoType } from "@/todoList/infrastructure/todoType.infrastructure";
 import TodoDraggableRow from "@/todoList/presentation/todoListTableComponents/todoDraggableRow";
 import TodoListForm from "@/todoList/presentation/todoListForm.presentation";
 import { ArrowLeft } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { sileo } from "sileo";
+import { AppStore } from "@/core/AppContext";
+import TodoColumns from "@/todoList/presentation/todoListTableComponents/todoColumns";
 
 const TodoListTable = () => {
+    const { permissions, requirePermission } = AppStore()
     const [editTodo, setEditTodo] = useState<TodoType | "new" | null>(null)
     const queryClient = useQueryClient()
+
+    const [editPermission, deletePermission, checkPermission, uncheckPermission] = useMemo(() => {
+        return [requirePermission('todo:update'), requirePermission('todo:delete'), requirePermission('todo:check'), requirePermission('todo:uncheck')]
+    }, [permissions])
 
     const request = useAutoRequest<TodoType[]>({
         queryKey: ["todoList"],
@@ -37,7 +44,7 @@ const TodoListTable = () => {
 
     const taskIds = useMemo(() => request.data?.map((task) => task.id) ?? [], [request.data])
 
-    const onDrag = (event: DragEndEvent) => {
+    const onDrag = useCallback((event: DragEndEvent) => {
         const { active, over } = event;
         if (active.id !== over?.id && request.data) {
             const oldIndex = request.data.findIndex((task) => task.id === active.id);
@@ -52,10 +59,15 @@ const TodoListTable = () => {
             })
             updateOrderRequest.mutate({ list }, { onSuccess: () => request.refetch() })
         }
-    }
+    }, [request.data, updateOrderRequest, request.refetch])
 
-    const onStatusChange = (todo: TodoType) => {
+    const onEdit = useCallback((todo: TodoType) => {
+        if(editPermission) setEditTodo(todo)
+    }, [editPermission])
+
+    const onStatusChange = useCallback((todo: TodoType) => {
         const isPending = todo.status == 1
+        if((!checkPermission && !uncheckPermission) || (!uncheckPermission && !isPending) || (!checkPermission && isPending)) return
         sileo.action({
             title: isPending ? "Mark as completed?" : "Mark as pending?",
             description: isPending
@@ -79,9 +91,10 @@ const TodoListTable = () => {
                 }
             }
         })
-    }
+    }, [checkPermission, uncheckPermission, statusChangeRequest, queryClient])
 
-    const onDelete = (todo: TodoType) => {
+    const onDelete = useCallback((todo: TodoType) => {
+        if(!deletePermission) return
         sileo.action({
             title: "Delete task?",
             description: `"${todo.task}" will be permanently deleted.`,
@@ -103,7 +116,7 @@ const TodoListTable = () => {
                 }
             }
         })
-    }
+    }, [deletePermission, deleteRequest, queryClient])
 
     if (editTodo !== null) {
         return (
@@ -130,24 +143,20 @@ const TodoListTable = () => {
             <DndContext collisionDetection={closestCenter} onDragEnd={onDrag}>
                 <Table>
                     <TableCaption>A list of tasks</TableCaption>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Task</TableHead>
-                            <TableHead className="w-[200px]">Description</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>User</TableHead>
-                            <TableHead>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
+                    <TodoColumns />
                     <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
                         <TableBody>
                             {request.data?.map((task) => (
                                 <TodoDraggableRow
                                     key={task.id}
                                     task={task}
-                                    onEdit={() => setEditTodo(task)}
-                                    onStatusChange={() => onStatusChange(task)}
-                                    onDelete={() => onDelete(task)}
+                                    onEdit={onEdit}
+                                    onStatusChange={onStatusChange}
+                                    onDelete={onDelete}
+                                    editPermission={editPermission}
+                                    deletePermission={deletePermission}
+                                    checkPermission={checkPermission}
+                                    uncheckPermission={uncheckPermission}
                                 />
                             ))}
                         </TableBody>

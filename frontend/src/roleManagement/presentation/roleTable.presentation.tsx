@@ -1,16 +1,23 @@
 import { ArrowLeft } from "lucide-react"
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableCaption } from "@/components/ui/table"
 import { useAutoRequest, useMutateRequest } from "@/shared/useRequest"
 import type { RoleType } from "@/roleManagement/infrastructure/roleType.infrastructure"
-import { Button } from "@/components/ui/button"
 import { sileo } from "sileo"
 import { useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import RoleForm from "@/roleManagement/presentation/roleForm.presentation"
+import { AppStore } from "@/core/AppContext"
+import RoleTableColumns from "@/roleManagement/presentation/roleTableComponents/roleTableColumns"
+import RoleTableRow from "@/roleManagement/presentation/roleTableComponents/roleTableRow"
 
 const RoleTable = () => {
+    const { permissions, requirePermission } = AppStore()
     const [editRole, setEditRole] = useState<RoleType | null>(null)
     const queryClient = useQueryClient()
+
+    const [editPermission, deletePermission] = useMemo(() => {
+        return [requirePermission("role:update"), requirePermission("role:delete")]
+    }, [permissions])
 
     const request = useAutoRequest<RoleType[]>({
         queryKey: ["roles"],
@@ -22,8 +29,12 @@ const RoleTable = () => {
         method: "DELETE",
     })
 
-    const onDelete = (role: RoleType) => {
-        if(role.is_immutable) return
+    const onEdit = useCallback((role: RoleType) => {
+        if(editPermission) setEditRole(role)
+    }, [editPermission])
+
+    const onDelete = useCallback((role: RoleType) => {
+        if(!deletePermission || role.is_immutable) return
         sileo.action({
             title: "Delete role?",
             description: `"${role.name}" will be permanently deleted.`,
@@ -45,32 +56,7 @@ const RoleTable = () => {
                 },
             },
         })
-    }
-
-    const renderRow = (role: RoleType) => (
-        <TableRow key={role.id}>
-            <TableCell>{role.name}</TableCell>
-            <TableCell><div className="max-w-[200px] whitespace-normal break-words">{role.description}</div></TableCell>
-            <TableCell className="flex gap-2">
-                {!role.is_immutable && <Button
-                    className="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-white"
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => setEditRole(role)}
-                >
-                    Edit
-                </Button>}
-                {!role.is_immutable && <Button
-                    className="bg-transparent border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => onDelete(role)}
-                >
-                    Delete
-                </Button>}
-            </TableCell>
-        </TableRow>
-    )
+    }, [deletePermission, deleteRequest, queryClient])
 
     if (editRole) {
         return (
@@ -93,15 +79,18 @@ const RoleTable = () => {
         <div>
             <Table>
                 <TableCaption>A list of roles</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead className="w-[200px]">Description</TableHead>
-                        <TableHead>Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
+                <RoleTableColumns />
                 <TableBody>
-                    {request.data?.map((role) => renderRow(role))}
+                    {request.data?.map((role) => (
+                        <RoleTableRow 
+                            key={role.id} 
+                            role={role} 
+                            onEdit={onEdit}
+                            onDelete={onDelete}
+                            editPermission={editPermission}
+                            deletePermission={deletePermission}
+                        />
+                    ))}
                 </TableBody>
             </Table>
         </div>

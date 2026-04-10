@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react"
+import { lazy, Suspense, useEffect, type ReactNode } from "react"
 import MenuBar from "@/shared/MenuBar"
 import { AppStore } from "@/core/AppContext"
 
@@ -9,7 +9,7 @@ const TodoListFormApplication = lazy(() => import("@/todoList/application/todoLi
 const TodoListTableApplication = lazy(() => import("@/todoList/application/todoListTable.application"))
 const RoleFormApplication = lazy(() => import("@/roleManagement/application/roleForm.application"))
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = ({ children }: { children: ReactNode }) => {
     const {
         openUserManagementTable, openUserManagementForm,
         openToDoListTable, openToDoListForm,

@@ -5,7 +5,7 @@ export interface AppContextType {
     setUser: (user: AuthType | null) => void
     permissions: string[]
     setPermissions: (permissions: string[]) => void
-    requirePermission: (permission: string) => boolean
+    requirePermission: (permission: string | string[]) => boolean
     // To Do List
     openToDoListForm: boolean
     setOpenToDoListForm: (bool: boolean) => void

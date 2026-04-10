@@ -1,14 +1,17 @@
 import { ArrowLeft } from "lucide-react";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableCaption } from "@/components/ui/table"
 import { useAutoRequest, useMutateRequest } from "@/shared/useRequest"
 import type { UserType } from "@/userManagement/infrastructure/userType.infrastructure"
-import { Button } from "@/components/ui/button"
 import { sileo } from "sileo"
 import { useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import UserForm from "@/userManagement/presentation/userForm.presentation"
+import UserTableColumns from "@/userManagement/presentation/userTableComponents/userTableColumns";
+import UserTableRow from "@/userManagement/presentation/userTableComponents/userTableRow";
+import { AppStore } from "@/core/AppContext";
 
 const UserTable = () => {
+    const { permissions, requirePermission } = AppStore()
     const [editUser, setEditUser] = useState<UserType | null>(null)
     const queryClient = useQueryClient()
     const request = useAutoRequest<UserType[]>({
@@ -16,17 +19,22 @@ const UserTable = () => {
         url: "/user"
     })
 
+    const [editPermission, suspendPermission, unsuspendPermission] = useMemo(() => {
+        return [requirePermission('user:update'), requirePermission('user:suspend'), requirePermission('user:unsuspend')]
+    }, [permissions])
+
     const statusChangeRequest = useMutateRequest<UserType[]>({
         url: "/user/status",
         method: "PATCH"
     })
 
-    const onEdit = (user: UserType) => {
-        setEditUser(user)
-    }
+    const onEdit = useCallback((user: UserType) => {
+        if(editPermission) setEditUser(user)
+    }, [editPermission])
 
-    const onStatusChange = (user: UserType) => {
+    const onStatusChange = useCallback((user: UserType) => {
         const isSuspend = user.status == 1
+        if((!suspendPermission && !unsuspendPermission) || (!suspendPermission && !isSuspend) || (!unsuspendPermission && isSuspend)) return
         sileo.action({
             title: isSuspend ? "Suspend user?" : "Activate user?",
             description: isSuspend
@@ -56,37 +64,8 @@ const UserTable = () => {
                 }
             }
         })
-    }
+    }, [suspendPermission, unsuspendPermission, statusChangeRequest, queryClient])
 
-    const renderUserData = (user: UserType) => {
-        const isSuspend = user.status == 1
-        return <TableRow key={user.id}>
-            <TableCell>{user.username}</TableCell>
-            <TableCell>{user.name}</TableCell>
-            <TableCell>{user.role}</TableCell>
-            <TableCell>{isSuspend ? "Active" : "Inactive"}</TableCell>
-            <TableCell className="flex gap-2" >
-                <Button
-                    className="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-white"
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => onEdit(user)}>
-                    Edit
-                </Button>
-                <Button
-                    className={isSuspend
-                        ? "bg-transparent border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                        : "bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-white"
-                    }
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => onStatusChange(user)}
-                >
-                    {isSuspend ? "Suspend" : "Activate"}
-                </Button>
-            </TableCell>
-        </TableRow>
-    }
     return (editUser ? <>
         <div className="flex items-center gap-1">
             <button
@@ -102,17 +81,19 @@ const UserTable = () => {
         <div>
             <Table>
                 <TableCaption>A list of users</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Username</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
+                <UserTableColumns />
                 <TableBody>
-                    {request.data?.map((user) => renderUserData(user))}
+                    {request.data?.map((user) => (
+                        <UserTableRow 
+                            key={user.id} 
+                            user={user} 
+                            onEdit={onEdit} 
+                            onStatusChange={onStatusChange}
+                            editPermission={editPermission}
+                            suspendPermission={suspendPermission}
+                            unsuspendPermission={unsuspendPermission}
+                        />
+                    ))}
                 </TableBody>
             </Table>
         </div>

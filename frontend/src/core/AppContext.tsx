@@ -24,23 +24,23 @@ export const AppStore = create<AppContextType>((set, get) => ({
             return permissions.includes(`${ALLINONE_PREFIX}${p.split(':')[1]}`)
         }
 
-        return check(permission)
+        return typeof permission === 'string' ? check(permission) : permission.some(check) 
     },
     // To Do List
     openToDoListForm: false,
-    setOpenToDoListForm: (bool) => set({ openToDoListForm: bool }),
+    setOpenToDoListForm: (bool) => set({ openToDoListForm: bool && get().requirePermission('todo:create') }),
     openToDoListTable: false,
-    setOpenToDoListTable: (bool) => set({ openToDoListTable: bool }),
+    setOpenToDoListTable: (bool) => set({ openToDoListTable: bool && get().requirePermission('todo:view') }),
     // User Management
     openUserManagementForm: false,
-    setOpenUserManagementForm: (bool) => set({ openUserManagementForm: bool }),
+    setOpenUserManagementForm: (bool) => set({ openUserManagementForm: bool && get().requirePermission('user:create') }),
     openUserManagementTable: false,
-    setOpenUserManagementTable: (bool) => set({ openUserManagementTable: bool }),
+    setOpenUserManagementTable: (bool) => set({ openUserManagementTable: bool && get().requirePermission('user:view') }),
     // Role Management
     openRoleManagementForm: false,
-    setOpenRoleManagementForm: (bool) => set({ openRoleManagementForm: bool }),
+    setOpenRoleManagementForm: (bool) => set({ openRoleManagementForm: bool && get().requirePermission('role:create') }),
     openRoleManagementTable: false,
-    setOpenRoleManagementTable: (bool) => set({ openRoleManagementTable: bool }),
+    setOpenRoleManagementTable: (bool) => set({ openRoleManagementTable: bool && get().requirePermission('role:view') }),
     reset: () => set({
         user: null,
         permissions: [],

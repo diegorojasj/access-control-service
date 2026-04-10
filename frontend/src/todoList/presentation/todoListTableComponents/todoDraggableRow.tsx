@@ -1,3 +1,4 @@
+import { memo } from "react"
 import { TableCell, TableRow } from "@/components/ui/table"
 import type { TodoType } from "@/todoList/infrastructure/todoType.infrastructure"
 import { useSortable } from "@dnd-kit/sortable"
@@ -6,12 +7,16 @@ import { Button } from "@/components/ui/button";
 
 interface DraggableRowProps {
     task: TodoType
-    onEdit: () => void
-    onStatusChange: () => void
-    onDelete: () => void
+    onEdit: (todo: TodoType) => void
+    onStatusChange: (todo: TodoType) => void
+    onDelete: (todo: TodoType) => void
+    editPermission: boolean
+    deletePermission: boolean
+    checkPermission: boolean
+    uncheckPermission: boolean
 }
 
-const TodoDraggableRow = ({ task, onEdit, onStatusChange, onDelete }: DraggableRowProps) => {
+const TodoDraggableRow = memo(({ task, onEdit, onStatusChange, onDelete, editPermission, deletePermission, checkPermission, uncheckPermission }: DraggableRowProps) => {
     const {
         setNodeRef,
         transform,
@@ -20,12 +25,12 @@ const TodoDraggableRow = ({ task, onEdit, onStatusChange, onDelete }: DraggableR
         listeners,
     } = useSortable({ id: task.id as number })
 
+    const isPending = task.status == 1
+
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
     }
-
-    const isPending = task.status == 1
 
     return (
         <TableRow
@@ -40,36 +45,36 @@ const TodoDraggableRow = ({ task, onEdit, onStatusChange, onDelete }: DraggableR
             <TableCell>{isPending ? "Pending" : "Completed"}</TableCell>
             <TableCell>{task.user?.name}</TableCell>
             <TableCell className="flex gap-2" onPointerDown={(e) => e.stopPropagation()}>
-                <Button
+                {editPermission && <Button
                     size="sm"
                     variant="secondary"
                     className="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-white"
-                    onClick={onEdit}
+                    onClick={() => onEdit(task)}
                 >
                     Edit
-                </Button>
-                <Button
+                </Button>}
+                {((checkPermission && isPending) || (uncheckPermission && !isPending)) && <Button
                     size="sm"
                     variant="secondary"
                     className={isPending
                         ? "bg-transparent border border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"
                         : "bg-transparent border border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-white"
                     }
-                    onClick={onStatusChange}
+                    onClick={() => onStatusChange(task)}
                 >
                     {isPending ? "Complete" : "Reopen"}
-                </Button>
-                <Button
+                </Button>}
+                {deletePermission && <Button
                     size="sm"
                     variant="secondary"
                     className="bg-transparent border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                    onClick={onDelete}
+                    onClick={() => onDelete(task)}
                 >
                     Delete
-                </Button>
+                </Button>}
             </TableCell>
         </TableRow>
     )
-}
+})
 
 export default TodoDraggableRow
