@@ -1,0 +1,15 @@
+.git
+.env
+.env.*
+
+# Frontend build artifacts and deps (installed inside the container)
+frontend/node_modules
+frontend/dist
+
+# Postgres data volume
+postgres/data
+
+# Python cache
+**/__pycache__
+**/*.pyc
+**/*.pyo

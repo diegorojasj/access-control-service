@@ -13,7 +13,7 @@ async function proxyToBackend(req: Request): Promise<Response> {
 }
 
 const server = serve({
-  port: Number(process.env.FRONTEND_PORT ?? 3000),
+  port: Number(process.env.BUN_PUBLIC_FRONTEND_PORT ?? 3000),
   routes: {
     "/auth": proxyToBackend,
     "/auth/*": proxyToBackend,
@@ -28,7 +28,7 @@ const server = serve({
     "/*": index,
   },
 
-  development: process.env.NODE_ENV !== "production" && {
+  development: process.env.BUN_PUBLIC_NODE_ENV !== "production" && {
     hmr: true,
     console: true,
   },

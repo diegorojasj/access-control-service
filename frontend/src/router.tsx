@@ -10,6 +10,8 @@ const router = createBrowserRouter([
         element: <AuthenticatedLayout />,
     },
     ...AuthRoute(),
-])
+], {
+    basename: process.env.NODE_ENV === "production" ? "/access-control-service" : "/",
+})
 
 export default router

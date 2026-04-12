@@ -62,6 +62,7 @@ services:
       <<: *postgres-env
       HOST: ${HOST:-localhost}
       PORT: ${PORT:-8000}
+      EXPIRES_IN: ${EXPIRES_IN:-10800}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       RELOAD: ${RELOAD:-false}
       WORKERS: ${WORKERS:-1}
@@ -78,13 +79,42 @@ services:
   web:
     build:
       context: .
-      dockerfile: containers/containerfiles/web.containerfile
+      dockerfile: containers/containerfiles/frontend.containerfile
     profiles: ["PROD"]
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - ./certbot/www:/var/www/certbot:z
+      - ./certbot/conf:/etc/letsencrypt:ro,z
     environment:
-      BUN_PUBLIC_API_BASE_URL: ${BUN_PUBLIC_API_BASE_URL:-http://localhost:8000}
-      BUN_PUBLIC_ENCRYPTION_SECRET: ${BUN_PUBLIC_ENCRYPTION_SECRET:-J0£\=i9=XHT{i&v9njwRj~Oo3kzy0Hk[77Jwz7N+ms1KOJ^/e;}
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8000}
+      DOMAIN: ${DOMAIN}
     depends_on:
       - backend
+
+  certbot:
+    image: certbot/certbot
+    profiles: ["PROD"]
+    volumes:
+      - ./certbot/www:/var/www/certbot:z
+      - ./certbot/conf:/etc/letsencrypt:z
+    environment:
+      DOMAIN: ${DOMAIN}
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+    entrypoint: >
+      /bin/sh -c '
+        if [ ! -f /etc/letsencrypt/live/$$DOMAIN/fullchain.pem ]; then
+          echo "Issuing certificate for $$DOMAIN...";
+          certbot certonly --webroot --webroot-path=/var/www/certbot
+            --non-interactive --agree-tos --no-eff-email
+            -m $$CERTBOT_EMAIL -d $$DOMAIN;
+        fi;
+        trap exit TERM;
+        while :; do
+          certbot renew --webroot --webroot-path=/var/www/certbot --quiet;
+          sleep 12h & wait $${!};
+        done
+      '
+    depends_on:
+      - web
