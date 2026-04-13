@@ -10,7 +10,8 @@ RUN bun install --frozen-lockfile
 COPY frontend/ ./
 
 # Run build directly
-RUN bun run build.ts
+ARG PUBLIC_PATH=/access-control-service/
+RUN bun run build.ts --public-path=${PUBLIC_PATH}
 
 # ---- Production stage ----
 FROM nginx:alpine
