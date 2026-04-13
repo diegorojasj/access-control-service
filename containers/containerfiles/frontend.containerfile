@@ -16,11 +16,10 @@ RUN bun run build.ts
 FROM nginx:alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
-
 COPY containers/nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY containers/entrypoints/entrypoint-frontend.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-EXPOSE 80 443
+EXPOSE 80
 
 ENTRYPOINT ["/entrypoint.sh"]

@@ -18,8 +18,6 @@ services:
     container_name: postgres
     environment:
       <<: *postgres-env
-    ports:
-      - "5432:5432"
     volumes:
       - type: bind
         source: ./postgres/data
@@ -53,15 +51,13 @@ services:
     build:
       context: .
       dockerfile: containers/containerfiles/backend.containerfile
-    ports:
-      - "8000:8000"
     volumes:
       - ./backend:/app:z
       - ./backend/requirements.default:/app/requirements.txt:z
     environment:
       <<: *postgres-env
-      HOST: ${HOST:-localhost}
-      PORT: ${PORT:-8000}
+      HOST: ${BACKEND_HOST:-0.0.0.0}
+      PORT: ${BACKEND_PORT:-8000}
       EXPIRES_IN: ${EXPIRES_IN:-10800}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       RELOAD: ${RELOAD:-false}
@@ -81,40 +77,22 @@ services:
       context: .
       dockerfile: containers/containerfiles/frontend.containerfile
     profiles: ["PROD"]
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./certbot/www:/var/www/certbot:z
-      - ./certbot/conf:/etc/letsencrypt:ro,z
     environment:
       BACKEND_URL: ${BACKEND_URL:-http://backend:8000}
-      DOMAIN: ${DOMAIN}
     depends_on:
       - backend
-
-  certbot:
-    image: certbot/certbot
-    profiles: ["PROD"]
-    volumes:
-      - ./certbot/www:/var/www/certbot:z
-      - ./certbot/conf:/etc/letsencrypt:z
-    environment:
-      DOMAIN: ${DOMAIN}
-      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
-    entrypoint: >
-      /bin/sh -c '
-        if [ ! -f /etc/letsencrypt/live/$$DOMAIN/fullchain.pem ]; then
-          echo "Issuing certificate for $$DOMAIN...";
-          certbot certonly --webroot --webroot-path=/var/www/certbot
-            --non-interactive --agree-tos --no-eff-email
-            -m $$CERTBOT_EMAIL -d $$DOMAIN;
-        fi;
-        trap exit TERM;
-        while :; do
-          certbot renew --webroot --webroot-path=/var/www/certbot --quiet;
-          sleep 12h & wait $${!};
-        done
-      '
-    depends_on:
+    networks:
+      - default
       - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.access-control-service.entrypoints=websecure"
+      - "traefik.http.routers.access-control-service.rule=Host(`${HOST:-localhost}`) && PathPrefix(`/access-control-service`)"
+      - "traefik.http.routers.access-control-service.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.access-control-service-strip.stripprefix.prefixes=/access-control-service"
+      - "traefik.http.routers.access-control-service.middlewares=access-control-service-strip"
+      - "traefik.http.services.access-control-service.loadbalancer.server.port=80"
+
+networks:
+  web:
+    external: true
