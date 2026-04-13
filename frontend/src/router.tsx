@@ -10,6 +10,6 @@ const router = createBrowserRouter([
         element: <AuthenticatedLayout />,
     },
     ...AuthRoute(),
-])
+], { basename: "/access-control-service" })
 
 export default router
