@@ -92,6 +92,10 @@ services:
       - "traefik.http.middlewares.access-control-service-strip.stripprefix.prefixes=/access-control-service"
       - "traefik.http.routers.access-control-service.middlewares=access-control-service-strip"
       - "traefik.http.services.access-control-service.loadbalancer.server.port=80"
+      - "traefik.http.routers.access-control-service-api.entrypoints=websecure"
+      - "traefik.http.routers.access-control-service-api.rule=Host(`${HOST:-localhost}`) && PathRegexp(`^/(auth|user|role|todo|permission)(/.*)?$$`)"
+      - "traefik.http.routers.access-control-service-api.tls.certresolver=myresolver"
+      - "traefik.http.routers.access-control-service-api.service=access-control-service"
 
 networks:
   default:
