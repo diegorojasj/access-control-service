@@ -30,15 +30,21 @@ const MenuBar = () => {
 
     // Static structure — Zustand setters are stable references, so this is created once
     const menuConfig = useMemo(() => [
-        { label: "To Do List",       permission: "todo:view", children: [{ label: "New", onClick: () => setOpenToDoListForm(true) },       { label: "View", onClick: () => setOpenToDoListTable(true) }] },
-        { label: "User Management",  permission: "user:view", children: [{ label: "New", onClick: () => setOpenUserManagementForm(true) },  { label: "View", onClick: () => setOpenUserManagementTable(true) }] },
-        { label: "Role Management",  permission: "role:view", children: [{ label: "New", onClick: () => setOpenRoleManagementForm(true) },  { label: "View", onClick: () => setOpenRoleManagementTable(true) }] },
+        { label: "To Do List",       children: [{ label: "New", permission: "todo:create",  onClick: () => setOpenToDoListForm(true) },       { label: "View", permission: "todo:view",  onClick: () => setOpenToDoListTable(true) }] },
+        { label: "User Management",  children: [{ label: "New", permission: "user:create",  onClick: () => setOpenUserManagementForm(true) },  { label: "View", permission: "user:view",  onClick: () => setOpenUserManagementTable(true) }] },
+        { label: "Role Management",  children: [{ label: "New", permission: "role:create",  onClick: () => setOpenRoleManagementForm(true) },  { label: "View", permission: "role:view",  onClick: () => setOpenRoleManagementTable(true) }] },
     ], [setOpenToDoListForm, setOpenToDoListTable, setOpenUserManagementForm, setOpenUserManagementTable, setOpenRoleManagementForm, setOpenRoleManagementTable])
 
     // Re-filters only when SSE pushes a new permissions array
+    // Parent is visible if at least one child's permission passes
     const menuItems = useMemo(
-        () => menuConfig.filter(item => requirePermission(item.permission)),
-        [permissions, menuConfig]
+        () => menuConfig
+            .map(item => ({
+                ...item,
+                children: item.children.filter(child => requirePermission(child.permission)),
+            }))
+            .filter(item => item.children.length > 0),
+        [permissions, menuConfig, requirePermission]
     )
 
     // Re-renders only when the visible set of items changes

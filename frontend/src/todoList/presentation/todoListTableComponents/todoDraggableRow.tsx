@@ -4,6 +4,7 @@ import type { TodoType } from "@/todoList/infrastructure/todoType.infrastructure
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
+import { GripVertical } from "lucide-react";
 
 interface DraggableRowProps {
     task: TodoType
@@ -37,18 +38,20 @@ const TodoDraggableRow = memo(({ task, onEdit, onStatusChange, onDelete, editPer
             ref={setNodeRef}
             style={style}
             {...attributes}
-            {...listeners}
             className="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors"
         >
+            <TableCell className="cursor-grab text-muted-foreground" {...listeners}>
+                <GripVertical size={16} />
+            </TableCell>
             <TableCell>{task.task}</TableCell>
-            <TableCell><div className="max-w-[200px] whitespace-normal break-words">{task.description}</div></TableCell>
+            <TableCell><div className="whitespace-normal break-words">{task.description}</div></TableCell>
             <TableCell>{isPending ? "Pending" : "Completed"}</TableCell>
             <TableCell>{task.user?.name}</TableCell>
-            <TableCell className="flex gap-2" onPointerDown={(e) => e.stopPropagation()}>
+            <TableCell className="flex flex-wrap gap-1" onPointerDown={(e) => e.stopPropagation()}>
                 {editPermission && <Button
                     size="sm"
                     variant="secondary"
-                    className="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-white"
+                    className="bg-transparent border border-green-400 text-green-400 hover:bg-green-400 hover:text-white px-2 text-xs"
                     onClick={() => onEdit(task)}
                 >
                     Edit
@@ -57,8 +60,8 @@ const TodoDraggableRow = memo(({ task, onEdit, onStatusChange, onDelete, editPer
                     size="sm"
                     variant="secondary"
                     className={isPending
-                        ? "bg-transparent border border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"
-                        : "bg-transparent border border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-white"
+                        ? "bg-transparent border border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white px-2 text-xs"
+                        : "bg-transparent border border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-white px-2 text-xs"
                     }
                     onClick={() => onStatusChange(task)}
                 >
@@ -67,7 +70,7 @@ const TodoDraggableRow = memo(({ task, onEdit, onStatusChange, onDelete, editPer
                 {deletePermission && <Button
                     size="sm"
                     variant="secondary"
-                    className="bg-transparent border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                    className="bg-transparent border border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-2 text-xs"
                     onClick={() => onDelete(task)}
                 >
                     Delete
@@ -76,5 +79,7 @@ const TodoDraggableRow = memo(({ task, onEdit, onStatusChange, onDelete, editPer
         </TableRow>
     )
 })
+
+TodoDraggableRow.displayName = "TodoDraggableRow"
 
 export default TodoDraggableRow

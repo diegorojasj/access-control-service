@@ -49,7 +49,7 @@ export function useAutoRequest<T = unknown, R = T>(options: UseAutoRequestOption
         queryKey,
         queryFn: async () => {
             const data = await request<T>({ url, method, headers })
-            return transform ? await transform(data) : data as unknown as R
+            return transform ? await transform(data) : data as R
         },
         refetchInterval: 25_000,
         refetchIntervalInBackground: false,
