@@ -1,12 +1,13 @@
-import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableCaption } from "@/components/ui/table"
 import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { useAutoRequest, useMutateRequest } from "@/shared/useRequest"
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { TodoType } from "@/todoList/infrastructure/todoType.infrastructure";
 import TodoDraggableRow from "@/todoList/presentation/todoListTableComponents/todoDraggableRow";
 import TodoListForm from "@/todoList/presentation/todoListForm.presentation";
 import { ArrowLeft } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
 import { sileo } from "sileo";
 import { AppStore } from "@/core/AppContext";
@@ -19,12 +20,12 @@ const TodoListTable = () => {
 
     const [editPermission, deletePermission, checkPermission, uncheckPermission] = useMemo(() => {
         return [requirePermission('todo:update'), requirePermission('todo:delete'), requirePermission('todo:check'), requirePermission('todo:uncheck')]
-    }, [permissions])
+    }, [permissions, requirePermission])
 
     const request = useAutoRequest<TodoType[]>({
         queryKey: ["todoList"],
         url: "/todo/list",
-        method: "GET"
+        method: "GET",
     })
 
     const updateOrderRequest = useMutateRequest({
@@ -44,6 +45,9 @@ const TodoListTable = () => {
 
     const taskIds = useMemo(() => request.data?.map((task) => task.id) ?? [], [request.data])
 
+    const updateOrderRequestRef = useRef(updateOrderRequest)
+    updateOrderRequestRef.current = updateOrderRequest
+
     const onDrag = useCallback((event: DragEndEvent) => {
         const { active, over } = event;
         if (active.id !== over?.id && request.data) {
@@ -57,9 +61,9 @@ const TodoListTable = () => {
                     list[task.id] = ind
                 }
             })
-            updateOrderRequest.mutate({ list }, { onSuccess: () => request.refetch() })
+            updateOrderRequestRef.current.mutate({ list }, { onSuccess: () => request.refetch() })
         }
-    }, [request.data, updateOrderRequest, request.refetch])
+    }, [request.data, request.refetch])
 
     const onEdit = useCallback((todo: TodoType) => {
         if(editPermission) setEditTodo(todo)
@@ -85,7 +89,7 @@ const TodoListTable = () => {
                         },
                         onError: (error) => {
                             const err = error as Error & { detail?: string }
-                            sileo.error({ title: "Status change failed", description: err.message ?? err.detail })
+                            sileo.error({ title: "Status change failed", description: err.detail ?? err.message })
                         }
                     })
                 }
@@ -110,13 +114,21 @@ const TodoListTable = () => {
                         },
                         onError: (error) => {
                             const err = error as Error & { detail?: string }
-                            sileo.error({ title: "Delete failed", description: err.message ?? err.detail })
+                            sileo.error({ title: "Delete failed", description: err.detail ?? err.message })
                         }
                     })
                 }
             }
         })
     }, [deletePermission, deleteRequest, queryClient])
+
+    if (request.isLoading) {
+        return <div className="flex justify-center p-8"><Spinner /></div>
+    }
+
+    if (request.isError) {
+        return <div className="text-sm text-red-500 p-4">Failed to load tasks.</div>
+    }
 
     if (editTodo !== null) {
         return (
@@ -139,9 +151,9 @@ const TodoListTable = () => {
     }
 
     return (
-        <div>
+        <div className="w-full min-w-0">
             <DndContext collisionDetection={closestCenter} onDragEnd={onDrag}>
-                <Table>
+                <Table className="table-fixed w-full">
                     <TableCaption>A list of tasks</TableCaption>
                     <TodoColumns />
                     <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
